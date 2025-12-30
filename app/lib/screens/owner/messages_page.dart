@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../../models/message.dart';
 import '../../services/message_service.dart';
+import '../../utils/date_formatter.dart';
 
 class MessagesPage extends StatefulWidget {
   final String token;
@@ -88,9 +89,9 @@ class _MessagesPageState extends State<MessagesPage> {
       itemCount: _messages.length,
       itemBuilder: (context, index) {
         final message = _messages[index];
-        final createdAtText = message.createdAt != null
-            ? _formatDateTime(message.createdAt!)
-            : '';
+        final createdAtText = DateFormatter.format(
+          message.createdAtRaw ?? '',
+        );
 
         return ListTile(
           title: Text(
@@ -130,16 +131,5 @@ class _MessagesPageState extends State<MessagesPage> {
     }
 
     return 'Mesajlar yüklenemedi.';
-  }
-
-  String _formatDateTime(DateTime dateTime) {
-    final local = dateTime.toLocal();
-    String two(int v) => v.toString().padLeft(2, '0');
-    final day = two(local.day);
-    final month = two(local.month);
-    final year = local.year.toString();
-    final hour = two(local.hour);
-    final minute = two(local.minute);
-    return '$day.$month.$year $hour:$minute';
   }
 }

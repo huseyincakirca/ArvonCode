@@ -1,10 +1,7 @@
-# Codex Kuralları
+# Codex Kullanım Kuralları
 
-- Root: /ArvonCode
-- Flutter: /app
-- Laravel: /api
-
-Her görevde:
-- Dosya yolu net
-- Tek sorumluluk
-- Tahmin yok
+- Tek repo (monorepo)
+- API ve App ayrımı korunur
+- Codex'e her zaman dosya yolu net verilir
+- Varsayım yok, koddan konuşulur
+- Legacy endpoint eklenmez

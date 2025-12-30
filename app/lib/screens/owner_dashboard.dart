@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/message.dart';
 import '../services/location_service.dart';
 import '../services/message_service.dart';
+import '../utils/date_formatter.dart';
 import 'owner/messages_page.dart';
 import 'owner/locations_page.dart';
 import 'settings_screen.dart';
@@ -359,7 +360,9 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
     }
 
     final content = _latestMessage?.content ?? '';
-    final createdAt = _latestMessage?.createdAt?.toString() ?? '';
+    final createdAt = DateFormatter.format(
+      _latestMessage?.createdAtRaw ?? '',
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -391,7 +394,9 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
 
     final latitude = _latestLocation?['lat']?.toString() ?? '';
     final longitude = _latestLocation?['lng']?.toString() ?? '';
-    final createdAt = _latestLocation?['created_at']?.toString() ?? '';
+    final createdAt = DateFormatter.format(
+      _latestLocation?['created_at']?.toString() ?? '',
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

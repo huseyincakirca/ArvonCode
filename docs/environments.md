@@ -1,15 +1,16 @@
-# Environments
+# Ortamlar (Environments)
 
-## Development
-- Localhost
-- Debug açık
+## Local
+- localhost
+- debug açık
+- test verisi
 
 ## Staging
-- Canlıya yakın
-- Test verisi
-- Gerçek API URL
+- Gerçek API
+- Test kullanıcıları
+- NFC test kartları
 
 ## Production
 - Gerçek kullanıcı
-- Gerçek veri
-- Log ve izleme zorunlu
+- Rate-limit aktif
+- Log zorunlu

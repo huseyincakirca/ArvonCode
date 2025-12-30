@@ -1,17 +1,40 @@
 # Mimari Yapı
 
-## Bileşenler
-- Mobile App (Flutter)
-- Backend API (Laravel)
-- Database (MySQL)
+## 1. Bileşenler
 
-## Akış
-Flutter → REST API → Database
+### Mobile App (Flutter)
+- Kullanıcı kayıt / giriş
+- Araç ekleme (NFC aktivasyon)
+- Gelen mesajları görüntüleme
+- Konum ve park geçmişi
 
-App:
-- Veri tutmaz
-- Sadece API ile konuşur
+### Backend API (Laravel)
+- Auth (Sanctum)
+- Araç yönetimi
+- Mesajlaşma
+- Konum kayıtları
+- Public (guest) endpoint'ler
 
-API:
-- Tüm iş mantığı burada
-- Yetkilendirme ve doğrulama burada
+### Public (Guest) Katmanı
+- NFC / QR okutulduğunda çalışır
+- Login gerektirmez
+- Rate-limit ve log zorunludur
+
+---
+
+## 2. Veri Akışı
+
+### Authenticated Akış
+App → API → Database
+
+### Guest Akış
+NFC / QR → Public API → Database → Owner bildirim
+
+---
+
+## 3. Güvenlik
+- Auth işlemleri: Sanctum token
+- Public endpoint'ler:
+  - throttle
+  - IP log
+  - validation zorunlu

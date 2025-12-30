@@ -1,9 +1,29 @@
-# Authentication
+# Kimlik Doğrulama (Auth)
 
-- Token bazlı kimlik doğrulama
-- Laravel Sanctum kullanılır
+## POST /api/register
+Kullanıcı kaydı ve token üretimi.
 
-Akış:
-1. Login
-2. Token alınır
-3. Tüm isteklerde Authorization header kullanılır
+Body:
+{
+  "name": "string",
+  "email": "string",
+  "password": "min 6"
+}
+
+---
+
+## POST /api/login
+Kullanıcı girişi ve token üretimi.
+
+Body:
+{
+  "email": "string",
+  "password": "string"
+}
+
+---
+
+## Authenticated Requests
+Tüm korumalı endpoint'lerde:
+
+Authorization: Bearer {token}

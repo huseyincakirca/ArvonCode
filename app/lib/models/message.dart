@@ -4,7 +4,7 @@ class Message {
   final String content;
   final String? phone;
   final String? senderIp;
-  final DateTime? createdAt;
+  final String? createdAtRaw;
 
   Message({
     required this.id,
@@ -12,7 +12,7 @@ class Message {
     required this.content,
     this.phone,
     this.senderIp,
-    this.createdAt,
+    this.createdAtRaw,
   });
 
   factory Message.fromJson(Map<String, dynamic> json) {
@@ -47,7 +47,7 @@ class Message {
       content: content,
       phone: _readOptional(json['phone']),
       senderIp: _readOptional(json['sender_ip']),
-      createdAt: _parseDate(json['created_at']),
+      createdAtRaw: _readOptional(json['created_at']),
     );
   }
 
@@ -55,12 +55,5 @@ class Message {
     if (value == null) return null;
     final str = value.toString();
     return str.isEmpty ? null : str;
-  }
-
-  static DateTime? _parseDate(dynamic value) {
-    if (value is String && value.isNotEmpty) {
-      return DateTime.tryParse(value);
-    }
-    return null;
   }
 }

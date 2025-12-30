@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../services/location_service.dart';
+import '../../utils/date_formatter.dart';
 
 class LocationsPage extends StatefulWidget {
   final String token;
@@ -72,8 +73,7 @@ class _LocationsPageState extends State<LocationsPage> {
       itemCount: _locations.length,
       itemBuilder: (context, index) {
         final loc = _locations[index];
-        final createdAtText =
-            loc.createdAt != null ? loc.createdAt!.toLocal().toString() : '';
+        final createdAtText = DateFormatter.format(loc.createdAt ?? '');
 
         return ListTile(
           title: Text(
@@ -112,7 +112,7 @@ class _LocationItem {
   final String lng;
   final String? plate;
   final String? source;
-  final DateTime? createdAt;
+  final String? createdAt;
 
   _LocationItem({
     required this.lat,
@@ -134,14 +134,13 @@ class _LocationItem {
       lng: json['lng']?.toString() ?? '',
       plate: plate,
       source: json['source']?.toString(),
-      createdAt: _parseDate(json['created_at']),
+      createdAt: _readString(json['created_at']),
     );
   }
 
-  static DateTime? _parseDate(dynamic value) {
+  static String? _readString(dynamic value) {
     if (value == null) return null;
     final str = value.toString();
-    if (str.isEmpty) return null;
-    return DateTime.tryParse(str);
+    return str.isEmpty ? null : str;
   }
 }

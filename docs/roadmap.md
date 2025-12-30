@@ -1,10 +1,15 @@
-# Roadmap
+# Yol Haritası
 
-## Tamamlananlar
-- Monorepo yapı
-- Flutter–API entegrasyonu
+## Tamamlanan
+- Auth
+- Vehicle
+- Public messaging
+- Location logging
 
 ## Sıradaki
-- NFC akışının netleştirilmesi
 - Staging ortam
-- Prod hazırlığı
+- Push notification stabilizasyonu
+- Legacy endpoint temizliği
+
+## Silinecekler
+- /api/v/* endpoint'leri
