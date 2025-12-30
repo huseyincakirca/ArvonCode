@@ -29,27 +29,13 @@ aktif referans DEĞİLDİR.
 
 ## 🔵 AKTİF CHECKPOINT DURUMU
 
-### Checkpoint #24 — Flutter Tarih Formatı Standardizasyonu
-- Durum: **Kod tamamlandı, GIT kapanışı TAMAMLANDI**
-- Not:
-  - Flutter tarafında tarih formatı mimarisi temizlendi ve tek merkezden yönetilir hale getirildi.
-  - Git Kapanışı Gerçekleştirildi.
-
-### CHECKPOINT #26 — Legacy Endpoint Temizliği (/api/v/* kaldırıldı)
-- Durum: TAMAMLANDI
-- Tamamlanan:
-  - routes içinde /api/v/* legacy endpoint’leri kaldırıldı
-  - Legacy endpoint’lere bağlı controller/method referansları temizlendi
-  - Repo genelinde /api/v ve /v referans taraması yapıldı, kalanlar silindi
-- Test sonucu:
-  - php artisan route:list üzerinde /api/v/* bulunamadı
-  - (Varsa) php artisan test başarıyla çalıştı
+Aktif checkpoint bulunmuyor. Son tamamlanan: Checkpoint #27
 
 
 
 ---
 
-## 🟡 SIRADAKİ CHECKPOINT (KİLİTLİ)
+## 🟡 SIRADAKİ CHECKPOINT (KİLİTLİ — #28 ADAY)
 
 Checkpoint #27 — Staging Ortam Kurulumu
 
@@ -263,147 +249,9 @@ Hata:
 
 ---
 
-## 6) 6) Endpoint Listesi (Arşivlenmiş Sözleşme)
+## 6) Endpoint Listesi (Arşivlenmiş Sözleşme)
 
-> Bu liste “gerçek sözleşme”. İsimler değişirse Flutter kırılır.
-
-### 6.1 Auth
-
-#### (A1) Register
-- **POST** `/auth/register`
-- Request:
-```json
-{ "name":"", "email":"", "password":"", "password_confirmation":"" }
-```
-
-#### (A2) Login
-- **POST** `/auth/login`
-- Request:
-```json
-{ "email":"", "password":"" }
-```
-- Response (örnek):
-```json
-{ "ok": true, "data": { "token":"...", "user":{...} } }
-```
-
-#### (A3) Logout
-- **POST** `/auth/logout` (auth required)
-- Header: `Authorization: Bearer <token>`
-
----
-
-### 6.2 Vehicles (Owner)
-- Not: Bu endpoint yeni bir kart (vehicle_id) üretmez.
-- `vehicle_id`, fiziksel kart üzerinde bulunan kimliktir ve aktivasyon sırasında kullanıcıya bağlanır.
-- `vehicle_id`, fiziksel karta (QR/NFC) önceden yazılmış benzersiz kart kimliğidir.
-- Bu endpoint yeni bir kart üretmez; mevcut kartın kullanıcı tarafından aktive edilmesini sağlar.
-
-#### (V1) Listele
-- **GET** `/vehicles` (auth required)
-
-#### (V2) Oluştur
-- **POST** `/vehicles` (auth required)
-- Request:
-```json
-{ "plate":"", "brand":"", "model":"", "color":"" }
-```
-
-
-#### (V3) Tek Araç
-- **GET** `/vehicles/{vehicle_uuid}` (auth required)
-- `{vehicle_uuid}` = `vehicles.vehicle_id`
-
----
-
-
-### 6.3 Public (Guest) — QR / NFC
-
-#### (P1) Araç Profilini Getir
-- **GET** `/api/public/vehicle/{vehicle_uuid}`
-
-**Açıklama:**
-QR veya NFC okutulduğunda çağrılan ana public endpoint.
-Araç bilgilerini ve aktif hızlı mesajları döner.
-
-**Response (örnek):**
-```json
-{
-  "ok": true,
-  "message": "Vehicle found",
-  "data": {
-    "vehicle_uuid": "ACX4921",
-    "plate": "41 ABC 123",
-    "brand": "Fiat",
-    "model": "Doblo",
-    "color": "Beyaz",
-    "quick_messages": [
-      { "id": 1, "text": "5 dk geliyorum" },
-      { "id": 2, "text": "Acil, aşağıdan ulaşın" }
-    ]
-  }
-}
-
-```
-
----
-
-### 6.4 Messages
-
-#### (M1) Ziyaretçi Özel Mesaj Gönder
-- **POST** `/public/message`
-- Request:
-```json
-{
-  "vehicle_uuid": "UUID",
-  "message": "Aracınız yolu kapatıyor",
-  "phone": "optional"
-}
-```
-- Backend:
-  1) `vehicles` tablosunda `vehicle_id=vehicle_uuid` bul
-  2) `messages.vehicle_id` alanına **vehicles.id** yaz
-  3) `sender_ip` kaydet
-
-#### (M2) Owner Mesajları Listele
-- **GET** `/messages` (auth required)
-
----
-
-### 6.5 Quick Messages
-
-#### (Q1) Hızlı Mesajları Listele
-- **GET** `/public/quick-messages`
-
-#### (Q2) Ziyaretçi Hızlı Mesaj Gönder
-- **POST** `/public/quick-message/send`
-- Request:
-```json
-{ "vehicle_uuid":"UUID", "quick_message_id": 2, "phone":"optional" }
-```
-- Not: Bu işlem `messages` tablosuna da yazılabilir (tek inbox).
-
----
-
-### 6.6 Locations
-
-#### (L1) Konum Kaydet (Guest)
-- **POST** `/public/location/save`
-- Request:
-```json
-{
-  "vehicle_uuid":"UUID",
-  "lat": 40.123,
-  "lng": 29.456,
-  "accuracy": 12.5,
-  "source": "guest_qr"
-}
-```
-
-#### (L2) Konumları Listele (Owner)
-- **GET** `/locations` (auth required)
-
----
+> Güncel ve bağlayıcı endpoint sözleşmeleri için `docs/` klasörüne bakılmalıdır. Bu bölüm yalnızca tarihsel referans niteliğindedir.
 
 ## 7) Laravel Dosya Yapısı (Referans)
 
@@ -1201,7 +1049,7 @@ Teknik Not:
   - User ↔ PushToken ilişkisi
   - POST /api/user/push-id endpoint’i
 - Not:
-  - Bu checkpoint sadece token kayıt altyapısını kapsar
+  - Bu checkpoint yalnızca token kayıt altyapısını kapsar. Controller/Request/Migration düzeyinde ek refactor bu checkpoint’e DAHİL DEĞİLDİR.
   - Push gönderimi bu checkpoint’te YOK
 
 ### CHECKPOINT #25 — Push Notification Altyapısı (Owner: Token Kaydı)
@@ -1213,8 +1061,31 @@ Teknik Not:
   - FormRequest tabanlı validation uygulandı
   - Namespace ve route disiplini sağlandı
 - Not:
-  - Bu checkpoint yalnızca token kayıt altyapısını kapsar
+  - Bu checkpoint yalnızca token kayıt altyapısını kapsar. Controller/Request/Migration düzeyinde ek refactor bu checkpoint’e DAHİL DEĞİLDİR.
   - Push gönderimi bu aşamada YOK
+
+### CHECKPOINT #26 — Legacy Endpoint Temizliği (/api/v/* kaldırıldı)
+- Durum: TAMAMLANDI
+- Tamamlanan:
+  - routes içinde /api/v/* legacy endpoint’leri kaldırıldı
+  - Legacy endpoint’lere bağlı controller/method referansları temizlendi
+  - Repo genelinde /api/v ve /v referans taraması yapıldı, kalanlar silindi
+- Test sonucu:
+  - php artisan route:list üzerinde /api/v/* bulunamadı
+  - (Varsa) php artisan test başarıyla çalıştı
+
+### CHECKPOINT #27 — ArvonCode Tutarlılık ve Gerçeklik Temizliği
+- Durum: TAMAMLANDI
+- Amaç:
+  - Proje kontrol dosyasının (ArvonCode.md) tek kaynak gerçeği olmasını sağlamak
+- Yapılanlar:
+  - Aktif checkpoint tanımı düzeltildi
+  - Çift yazılmış checkpoint (#24) tekilleştirildi
+  - Checkpoint #25 kapsamı netleştirildi (sessiz genişleme engellendi)
+  - Arşiv bölümündeki güncel olmayan endpoint tanımları yanlış yönlendirmeye karşı işaretlendi
+- Etki:
+  - Proje yönetimi ile teknik gerçekler arasındaki kopukluk giderildi
+  - Bir sonraki checkpoint için net ve güvenilir zemin oluşturuldu
 
 ### [2025-12-28] Owner Dashboard için Latest Message endpoint’i ve bütünleşik test
 - Ne değişti:
