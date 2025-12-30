@@ -1133,6 +1133,9 @@ Teknik Not:
   - VehicleController tüm endpoint’leri response standardına alındı
   - savePushId legacy response temizlendi
   - Auth’lu endpoint’lerde response tutarsızlığı kalmadı
+  - Intelephense vendor kaynaklı false-positive hatalar IDE seviyesinde temizlendi
+  - Application koduna dokunulmadı
+  - Static analysis yalnızca proje kodunu kapsayacak şekilde sınırlandı
 - Not:
   - response standardizasyonu tamamlandı, test aşamasına hazır
 

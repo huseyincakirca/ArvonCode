@@ -1,0 +1,8 @@
+{
+  "intelephense.files.exclude": [
+    "**/vendor/**"
+  ],
+  "intelephense.environment.includePaths": [
+    "_ide_helper"
+  ]
+}
