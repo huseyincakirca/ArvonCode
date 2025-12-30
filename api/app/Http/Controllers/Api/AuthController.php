@@ -70,7 +70,11 @@ class AuthController extends Controller
         $user->push_id = $req->push_id;
         $user->save();
 
-        return response()->json(['status' => 'saved']);
+        return response()->json([
+            'ok' => true,
+            'message' => 'Push id saved',
+            'data' => new \stdClass(),
+        ]);
     }
 
     public function logout(Request $request)

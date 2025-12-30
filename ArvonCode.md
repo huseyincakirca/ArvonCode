@@ -1130,6 +1130,11 @@ Teknik Not:
   - Static analyzer (Intelephense) false-positive hataları temizlendi
   - Runtime davranışı değiştirilmedi
   - Test öncesi kod hijyeni tamamlandı
+  - VehicleController tüm endpoint’leri response standardına alındı
+  - savePushId legacy response temizlendi
+  - Auth’lu endpoint’lerde response tutarsızlığı kalmadı
+- Not:
+  - response standardizasyonu tamamlandı, test aşamasına hazır
 
 ### [2025-12-28] Owner Dashboard için Latest Message endpoint’i ve bütünleşik test
 - Ne değişti:

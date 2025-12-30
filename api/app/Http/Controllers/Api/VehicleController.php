@@ -18,7 +18,11 @@ class VehicleController extends Controller
         $exists = Vehicle::where('vehicle_id', $req->vehicle_id)->first();
 
         if ($exists && $exists->user_id != auth()->id()) {
-            return response()->json(['error' => 'This tag belongs to another user'], 403);
+            return response()->json([
+                'ok' => false,
+                'message' => 'This tag belongs to another user',
+                'data' => new \stdClass(),
+            ], 403);
         }
 
         // Ekle veya güncelle
@@ -27,14 +31,24 @@ class VehicleController extends Controller
             ['user_id' => auth()->id()]
         );
 
-        return response()->json(['vehicle' => $vehicle]);
+        return response()->json([
+            'ok' => true,
+            'message' => 'Vehicle activated',
+            'data' => [
+                'vehicle' => $vehicle,
+            ],
+        ]);
     }
 
     public function myVehicles()
     {
         /** @var \App\Models\User $user */
         $user = auth()->user();
-        return response()->json($user->vehicles);
+        return response()->json([
+            'ok' => true,
+            'message' => 'My vehicles',
+            'data' => $user->vehicles,
+        ]);
     }
 
     public function info($vehicleId)
@@ -42,13 +56,25 @@ class VehicleController extends Controller
         $vehicle = Vehicle::where('vehicle_id', $vehicleId)->first();
 
         if (!$vehicle) {
-            return response()->json(['error' => 'Vehicle not found'], 404);
+            return response()->json([
+                'ok' => false,
+                'message' => 'Vehicle not found',
+                'data' => new \stdClass(),
+            ], 404);
         }
 
         if ($vehicle->user_id !== auth()->id()) {
-            return response()->json(['error' => 'Unauthorized'], 403);
+            return response()->json([
+                'ok' => false,
+                'message' => 'Unauthorized',
+                'data' => new \stdClass(),
+            ], 403);
         }
 
-        return response()->json($vehicle);
+        return response()->json([
+            'ok' => true,
+            'message' => 'Vehicle info',
+            'data' => $vehicle,
+        ]);
     }
 }
