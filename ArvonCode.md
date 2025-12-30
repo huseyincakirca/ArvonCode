@@ -29,34 +29,18 @@ aktif referans DEĞİLDİR.
 
 ## 🔵 AKTİF CHECKPOINT DURUMU
 
-Aktif checkpoint bulunmuyor. Son tamamlanan: Checkpoint #27
+Aktif checkpoint: Checkpoint #28 — Staging Ortam Kurulumu
 
 
 
 ---
 
-## 🟡 SIRADAKİ CHECKPOINT (KİLİTLİ — #28 ADAY)
-
-Checkpoint #27 — Staging Ortam Kurulumu
-
-⚠️ Bu checkpoint başlatılmadı.
-- Hedef: staging env (API base URL + test kullanıcıları + NFC test kartları) netleştirilecek
+## 🟡 SIRADAKİ CHECKPOINT (KİLİTLİ — #29 ADAY)
 
 
 ### ⏭️ BİR SONRAKİ ADIMA ETKİSİ
 
-- Tarih formatı ve veri sunumu mimarisi stabilize edildiği için:
-  - Push Notification altyapısında timestamp yönetimi güvenli hale geldi
-  - Backend → Flutter veri sözleşmesi netleşti
-- Checkpoint #24 git kapanışı tamamlandığında:
-  - CHECKPOINT #25 (Push Notification — Owner: Yeni Mesaj) başlatılabilir
-  - Event / Queue / Notification mimarisi izlenebilir commit geçmişi üzerinden ilerletilebilir
-
-### Bir sonraki checkpoint hedefi
-- CHECKPOINT #25 — Push Notification (Owner: Yeni Mesaj Bildirimi)
-- Ön koşul: Checkpoint #24’ün git kapanışının yapılması
-
--
+Staging ortam tamamlanmadan prod veya push notification adımlarına geçilmez.
 
 
 ## 🗂 ARŞİV – TARİHSEL TEKNİK NOTLAR
@@ -1086,6 +1070,18 @@ Teknik Not:
 - Etki:
   - Proje yönetimi ile teknik gerçekler arasındaki kopukluk giderildi
   - Bir sonraki checkpoint için net ve güvenilir zemin oluşturuldu
+
+### CHECKPOINT #28 — Staging Ortam Kurulumu
+- Durum: BAŞLATILDI
+- Amaç:
+  - Production’dan izole bir staging ortamı oluşturmak
+  - API ve Flutter için ayrı base URL tanımlamak
+- Kapsam:
+  - Backend (.env) staging ayrımı
+  - Flutter tarafında staging baseUrl hazırlığı
+- Not:
+  - Bu checkpoint yalnızca ortam hazırlığını kapsar
+  - Firebase / Push gönderimi bu checkpoint’te YOK
 
 ### [2025-12-28] Owner Dashboard için Latest Message endpoint’i ve bütünleşik test
 - Ne değişti:
