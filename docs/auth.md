@@ -23,6 +23,27 @@ Body:
 
 ---
 
+## POST /api/logout
+Auth token revoke işlemi.
+
+Auth:
+- Authorization: Bearer {token} (Sanctum)
+
+Response:
+```
+{
+  "ok": true,
+  "message": "Logged out",
+  "data": {}
+}
+```
+
+Not:
+- Sadece currentAccessToken silinir
+- Refresh token yoktur
+
+---
+
 ## Authenticated Requests
 Tüm korumalı endpoint'lerde:
 

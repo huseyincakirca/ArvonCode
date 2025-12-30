@@ -59,4 +59,17 @@ class AuthController extends Controller
         return response()->json(['status' => 'saved']);
     }
 
+    public function logout(Request $request)
+    {
+        $token = $request->user()->currentAccessToken();
+        if ($token) {
+            $token->delete();
+        }
+
+        return response()->json([
+            'ok' => true,
+            'message' => 'Logged out',
+            'data' => new \stdClass(),
+        ]);
+    }
 }
