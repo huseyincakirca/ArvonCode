@@ -1,8 +1,20 @@
+enum Environment { dev, staging, prod }
+
 class ApiConfig {
-  static const bool isProd = false;
+  static const Environment environment = Environment.staging;
 
-  static const String devBaseUrl = 'http://192.168.1.115:8000/api';
-  static const String prodBaseUrl = 'https://domain.com/api';
+  static const String _devBaseUrl = 'http://localhost:8000/api';
+  static const String _stagingBaseUrl = 'http://staging.localhost/api';
+  static const String _prodBaseUrl = 'https://domain.com/api';
 
-  static String get baseUrl => isProd ? prodBaseUrl : devBaseUrl;
+  static String get baseUrl {
+    switch (environment) {
+      case Environment.dev:
+        return _devBaseUrl;
+      case Environment.staging:
+        return _stagingBaseUrl;
+      case Environment.prod:
+        return _prodBaseUrl;
+    }
+  }
 }
