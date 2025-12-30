@@ -1072,7 +1072,7 @@ Teknik Not:
   - Bir sonraki checkpoint için net ve güvenilir zemin oluşturuldu
 
 ### CHECKPOINT #28 — Staging Ortam Kurulumu
-- Durum: BAŞLATILDI
+- Durum: TAMAMLANDI
 - Amaç:
   - Production’dan izole bir staging ortamı oluşturmak
   - API ve Flutter için ayrı base URL tanımlamak
@@ -1087,6 +1087,8 @@ Teknik Not:
   - Staging ve prod environment ayrımı netleştirildi
   - Flutter ApiConfig yapısına staging environment eklendi
   - dev / staging / prod ayrımı enum tabanlı hale getirildi
+  - Staging environment güvenlik temizliği yapıldı
+  - Hardcode test token’ları projeden kaldırıldı
 - Test:
   - APP_ENV=staging ile Laravel config cache başarıyla oluşturuldu
   - Flutter uygulaması staging baseUrl ile API çağrısı yapabiliyor (local run denemesi erişim izni hatası nedeniyle teyit edilemedi)
