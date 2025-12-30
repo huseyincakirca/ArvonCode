@@ -1123,6 +1123,14 @@ Teknik Not:
   - Login ve register auth response’ları standart {ok,message,data} formatına alındı
   - Auth endpoint’leri arasında response tutarsızlığı giderildi
 
+### CHECKPOINT #31 — Auth Dayanıklılık & Test Hazırlığı
+- Durum: AKTİF
+- Yapılanlar:
+  - Backend genelinde namespace / use / model typing hijyeni yapıldı
+  - Static analyzer (Intelephense) false-positive hataları temizlendi
+  - Runtime davranışı değiştirilmedi
+  - Test öncesi kod hijyeni tamamlandı
+
 ### [2025-12-28] Owner Dashboard için Latest Message endpoint’i ve bütünleşik test
 - Ne değişti:
     Owner Dashboard “Son Mesaj” paneli mesaj liste endpoint’inden ayrıldı ve /api/messages/latest ile tek kayıt bazlı özet akışına geçirildi.

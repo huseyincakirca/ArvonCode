@@ -32,7 +32,9 @@ class VehicleController extends Controller
 
     public function myVehicles()
     {
-        return response()->json(auth()->user()->vehicles);
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
+        return response()->json($user->vehicles);
     }
 
     public function info($vehicleId)

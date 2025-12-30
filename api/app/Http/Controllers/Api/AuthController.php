@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\User;
+use App\Http\Controllers\Controller;
 
 class AuthController extends Controller
 {
@@ -45,6 +45,7 @@ class AuthController extends Controller
             ], 401);
         }
 
+        /** @var \App\Models\User $user */
         $user = Auth::user();
         $token = $user->createToken('api')->plainTextToken;
 
@@ -64,6 +65,7 @@ class AuthController extends Controller
             'push_id' => 'required'
         ]);
 
+        /** @var \App\Models\User $user */
         $user = auth()->user();
         $user->push_id = $req->push_id;
         $user->save();
