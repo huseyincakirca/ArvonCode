@@ -29,18 +29,19 @@ aktif referans DEĞİLDİR.
 
 ## 🔵 AKTİF CHECKPOINT DURUMU
 
-Aktif checkpoint: Checkpoint #28 — Staging Ortam Kurulumu
+Aktif checkpoint: Checkpoint #30 — Logout & Token Invalidasyonu (backend logout endpoint eksik)
 
 
 
 ---
 
-## 🟡 SIRADAKİ CHECKPOINT (KİLİTLİ — #29 ADAY)
+## 🟡 SIRADAKİ CHECKPOINT (KİLİTLİ — #31 ADAY)
 
 
 ### ⏭️ BİR SONRAKİ ADIMA ETKİSİ
 
 Staging ortam tamamlanmadan prod veya push notification adımlarına geçilmez.
+Logout endpoint eksik olduğu için #30 blokaj altında; backend logout endpoint’i eklendikten sonra ilerlenebilir.
 
 
 ## 🗂 ARŞİV – TARİHSEL TEKNİK NOTLAR
@@ -1105,6 +1106,17 @@ Teknik Not:
   - Login ekranındaki debug token temizleme davranışı kaldırıldı
 - Not:
   - Bu adımda refresh token ve logout henüz yok
+
+### CHECKPOINT #30 — Logout & Token Invalidasyonu
+- Durum: BLOKE (backend logout endpoint dokümante edilmemiş)
+- Amaç:
+  - Güvenli logout akışı ile token’ı backend ve frontend tarafında temizlemek
+- Kapsam:
+  - Auth logout endpoint’ini kullanarak token’ın geçersiz kılınması
+  - Uygulama içinde logout akışı (Login’e yönlendirme)
+- Not:
+  - refresh token bu checkpoint’te yok
+  - Backend logout endpoint’i docs’ta bulunamadı; eklenmeden frontend tarafı ilerleyemez
 
 ### [2025-12-28] Owner Dashboard için Latest Message endpoint’i ve bütünleşik test
 - Ne değişti:
