@@ -1093,6 +1093,14 @@ Teknik Not:
   - APP_ENV=staging ile Laravel config cache başarıyla oluşturuldu
   - Flutter uygulaması staging baseUrl ile API çağrısı yapabiliyor (local run denemesi erişim izni hatası nedeniyle teyit edilemedi)
 
+### CHECKPOINT #29 — Flutter Auth Token Yönetimi Altyapısı
+- Durum: BAŞLATILDI
+- Yapılanlar:
+  - Flutter tarafında secure token storage altyapısı kuruldu
+  - App başlangıcında token var/yok kontrolü eklendi
+- Not:
+  - Bu adımda refresh token ve logout henüz yok
+
 ### [2025-12-28] Owner Dashboard için Latest Message endpoint’i ve bütünleşik test
 - Ne değişti:
     Owner Dashboard “Son Mesaj” paneli mesaj liste endpoint’inden ayrıldı ve /api/messages/latest ile tek kayıt bazlı özet akışına geçirildi.

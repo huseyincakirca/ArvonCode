@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'screens/home_screen.dart';
 import 'config/api_config.dart';
+import 'screens/home_screen.dart';
+import 'services/auth_storage.dart';
 
 void main() {
   // Choose global environment here (currently staging).
@@ -20,7 +21,22 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'ArvonCode',
-      home: const HomeScreen(),
+      home: FutureBuilder<String?>(
+        future: AuthStorage.getToken(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            );
+          }
+
+          final token = snapshot.data;
+          final hasToken = token != null && token.isNotEmpty;
+
+          // Token varsa mevcut home akışına geç; yoksa login akışına bağlanana kadar HomeScreen kullanılır.
+          return hasToken ? const HomeScreen() : const HomeScreen();
+        },
+      ),
     );
   }
 }
