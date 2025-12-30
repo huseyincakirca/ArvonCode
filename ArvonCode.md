@@ -1094,13 +1094,15 @@ Teknik Not:
   - Flutter uygulaması staging baseUrl ile API çağrısı yapabiliyor (local run denemesi erişim izni hatası nedeniyle teyit edilemedi)
 
 ### CHECKPOINT #29 — Flutter Auth Token Yönetimi Altyapısı
-- Durum: BAŞLATILDI
+- Durum: TAMAMLANDI
 - Yapılanlar:
   - Flutter tarafında secure token storage altyapısı kuruldu
   - App başlangıcında token var/yok kontrolü eklendi
   - Minimal login ekranı eklendi
   - Login sonrası token secure storage’a kaydediliyor
   - App başlangıcında Login / Home ayrımı aktif hale geldi
+  - Login response parse işlemi API standart formatına uygun hale getirildi
+  - Login ekranındaki debug token temizleme davranışı kaldırıldı
 - Not:
   - Bu adımda refresh token ve logout henüz yok
 

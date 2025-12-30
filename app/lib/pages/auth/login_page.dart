@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../services/auth_service.dart';
-import '../../services/auth_storage.dart';
 import '../../screens/home_screen.dart';
 
 class LoginPage extends StatefulWidget {
@@ -54,26 +53,11 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  Future<void> _onClearToken() async {
-    await AuthStorage.clearToken();
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Token temizlendi')),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Giriş Yap'),
-        actions: [
-          IconButton(
-            onPressed: _onClearToken,
-            icon: const Icon(Icons.delete_outline),
-            tooltip: 'Token temizle',
-          ),
-        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

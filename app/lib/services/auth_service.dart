@@ -28,11 +28,16 @@ class AuthService {
     }
 
     final decoded = jsonDecode(response.body);
-    if (decoded is! Map || decoded['token'] == null) {
-      throw Exception('Geçersiz yanıt');
+    if (decoded is! Map || decoded['ok'] != true) {
+      throw Exception('Giriş başarısız');
     }
 
-    final token = decoded['token'].toString();
+    final data = decoded['data'];
+    if (data is! Map || data['token'] == null) {
+      throw Exception('Geçersiz yanıt: token yok');
+    }
+
+    final token = data['token'].toString();
     await AuthStorage.saveToken(token);
     return token;
   }
