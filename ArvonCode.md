@@ -29,7 +29,7 @@ aktif referans DEĞİLDİR.
 
 ## 🔵 AKTİF CHECKPOINT DURUMU
 
-Aktif checkpoint: Checkpoint #31 — (devam eden)
+Aktif checkpoint: Checkpoint #31 — AKTİF — Auth dayanıklılık & test hazırlığı
 
 
 
@@ -1120,6 +1120,8 @@ Teknik Not:
   - Backend logout endpoint’i eklendi (POST /api/logout)
   - Sanctum currentAccessToken revoke ediliyor
   - Backend logout smoke test başarılı
+  - Login ve register auth response’ları standart {ok,message,data} formatına alındı
+  - Auth endpoint’leri arasında response tutarsızlığı giderildi
 
 ### [2025-12-28] Owner Dashboard için Latest Message endpoint’i ve bütünleşik test
 - Ne değişti:
