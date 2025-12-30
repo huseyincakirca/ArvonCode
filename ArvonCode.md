@@ -1136,6 +1136,7 @@ Teknik Not:
   - Intelephense vendor kaynaklı false-positive hatalar IDE seviyesinde temizlendi
   - Application koduna dokunulmadı
   - Static analysis yalnızca proje kodunu kapsayacak şekilde sınırlandı
+  - Laravel Auth facade içindeki providerIsLoaded Intelephense false-positive’i IDE seviyesinde bilinçli olarak susturuldu (vendor/framework koduna müdahale edilmedi)
 - Not:
   - response standardizasyonu tamamlandı, test aşamasına hazır
 

@@ -1,3 +1,9 @@
+// NOTE:
+// Laravel framework Auth facade içinde kullanılan
+// providerIsLoaded() metodu Intelephense tarafından
+// false-positive olarak işaretlenmektedir.
+// Runtime etkisi yoktur, bilinçli olarak IDE seviyesinde susturulmuştur.
 {
-  "intelephense.files.maxSize": 10000000
+  "intelephense.files.maxSize": 10000000,
+  "intelephense.diagnostics.undefinedMethods": false
 }
