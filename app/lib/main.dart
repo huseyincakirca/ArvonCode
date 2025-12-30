@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'config/api_config.dart';
 import 'screens/home_screen.dart';
+import 'pages/auth/login_page.dart';
 import 'services/auth_storage.dart';
 
 void main() {
@@ -33,8 +34,7 @@ class MyApp extends StatelessWidget {
           final token = snapshot.data;
           final hasToken = token != null && token.isNotEmpty;
 
-          // Token varsa mevcut home akışına geç; yoksa login akışına bağlanana kadar HomeScreen kullanılır.
-          return hasToken ? const HomeScreen() : const HomeScreen();
+          return hasToken ? const HomeScreen() : const LoginPage();
         },
       ),
     );

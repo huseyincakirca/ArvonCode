@@ -1098,6 +1098,9 @@ Teknik Not:
 - Yapılanlar:
   - Flutter tarafında secure token storage altyapısı kuruldu
   - App başlangıcında token var/yok kontrolü eklendi
+  - Minimal login ekranı eklendi
+  - Login sonrası token secure storage’a kaydediliyor
+  - App başlangıcında Login / Home ayrımı aktif hale geldi
 - Not:
   - Bu adımda refresh token ve logout henüz yok
 
