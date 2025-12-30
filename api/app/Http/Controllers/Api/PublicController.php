@@ -5,30 +5,10 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Vehicle;
-use App\Models\User;
 use App\Models\QuickMessage;
 
 class PublicController extends Controller
 {
-    // Kart okutulunca araç bilgisi döndür
-    public function viewVehicle($tag)
-    {
-        $tag = trim($tag);
-        // Global scope'ları kapat -> user_id filtresi devre dışı
-        $vehicle = Vehicle::withoutGlobalScopes()
-            ->where('vehicle_id', $tag)
-            ->first();
-
-        if (!$vehicle) {
-            return response()->json(['error' => 'Araç bulunamadı'], 404);
-        }
-
-        return response()->json([
-            'vehicle' => $vehicle,
-            'owner'   => $vehicle->user,
-        ]);
-    }
-
     // Kart üzerinden araç sahibine mesaj gönder
     public function sendMessage(Request $request)
     {

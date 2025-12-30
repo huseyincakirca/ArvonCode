@@ -1,15 +1,14 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\VehicleController;
 use App\Http\Controllers\Api\ParkingController;
 use App\Http\Controllers\Api\PublicController;
-// MessageController eksik olabilir, onu da ekledim garanti olsun
-use App\Http\Controllers\MessageController;
-use App\Http\Controllers\QuickMessageController;
-use App\Http\Controllers\LocationController;
+use App\Http\Controllers\Api\MessageController;
+use App\Http\Controllers\Api\QuickMessageController;
+use App\Http\Controllers\Api\LocationController;
+use App\Http\Controllers\Api\UserPushTokenController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,7 +29,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/vehicle/{id}', [VehicleController::class, 'info']);
     Route::get('/vehicles', [VehicleController::class, 'myVehicles']);
 
-    // Mesaj İşlemleri (BURASI EKLENDİ)
+    // Mesaj İşlemleri
     Route::get('/messages/latest', [MessageController::class, 'latest']);
     Route::get('/messages', [MessageController::class, 'index']);
 
@@ -43,12 +42,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/parking/delete/{id}', [ParkingController::class, 'deleteParking']);
 
     // Push Notification ID Kaydetme
-    Route::post('/user/push-id', [AuthController::class, 'savePushId']);
+    Route::post('/user/push-id', [UserPushTokenController::class, 'store']);
 });
-
-// Eski public route'lar (geriye dönük uyumluluk için durabilir veya silebilirsin, aşağıda yenileri var)
-Route::get('/v/{tag}', [PublicController::class, 'viewVehicle']);
-Route::post('/v/{tag}/message', [PublicController::class, 'sendMessage']);
 
 // Public (Ziyaretçi) İşlemleri
 Route::prefix('public')

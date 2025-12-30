@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use App\Models\Vehicle;
+use App\Models\UserPushToken;
 
 class User extends Authenticatable
 {
@@ -45,6 +47,11 @@ class User extends Authenticatable
 
     public function vehicles() {
     return $this->hasMany(Vehicle::class);
+    }
+
+    public function pushTokens()
+    {
+        return $this->hasMany(UserPushToken::class);
     }
 
 }

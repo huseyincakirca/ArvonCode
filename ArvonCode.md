@@ -30,10 +30,20 @@ aktif referans DEĞİLDİR.
 ## 🔵 AKTİF CHECKPOINT DURUMU
 
 ### Checkpoint #24 — Flutter Tarih Formatı Standardizasyonu
-- Durum: **Kod tamamlandı, GIT kapanışı BEKLENİYOR**
+- Durum: **Kod tamamlandı, GIT kapanışı TAMAMLANDI**
 - Not:
   - Flutter tarafında tarih formatı mimarisi temizlendi ve tek merkezden yönetilir hale getirildi.
-  - Ancak `git status / add / commit / push` çıktıları paylaşılmadığı için checkpoint henüz **resmi olarak kapatılamaz**.
+  - Git Kapanışı Gerçekleştirildi.
+
+### CHECKPOINT #26 — Legacy Endpoint Temizliği (/api/v/* kaldırıldı)
+- Durum: TAMAMLANDI
+- Tamamlanan:
+  - routes içinde /api/v/* legacy endpoint’leri kaldırıldı
+  - Legacy endpoint’lere bağlı controller/method referansları temizlendi
+  - Repo genelinde /api/v ve /v referans taraması yapıldı, kalanlar silindi
+- Test sonucu:
+  - php artisan route:list üzerinde /api/v/* bulunamadı
+  - (Varsa) php artisan test başarıyla çalıştı
 
 
 
@@ -41,9 +51,10 @@ aktif referans DEĞİLDİR.
 
 ## 🟡 SIRADAKİ CHECKPOINT (KİLİTLİ)
 
-Checkpoint .......
+Checkpoint #27 — Staging Ortam Kurulumu
 
 ⚠️ Bu checkpoint başlatılmadı.
+- Hedef: staging env (API base URL + test kullanıcıları + NFC test kartları) netleştirilecek
 
 
 ### ⏭️ BİR SONRAKİ ADIMA ETKİSİ
@@ -58,6 +69,7 @@ Checkpoint .......
 ### Bir sonraki checkpoint hedefi
 - CHECKPOINT #25 — Push Notification (Owner: Yeni Mesaj Bildirimi)
 - Ön koşul: Checkpoint #24’ün git kapanışının yapılması
+
 -
 
 
@@ -1172,6 +1184,37 @@ Teknik Not:
   - Git kapanışı bekleniyor (commit & push doğrulaması olmadan checkpoint kapatılama
 
 
+### CHECKPOINT #24 — Flutter Tarih Formatı Standardizasyonu
+- Durum: TAMAMLANDI
+- Açıklama:
+  - Flutter UI genelinde tarih/saat gösterimi merkezi DateFormatter üzerinden yönetilecek şekilde standardize edildi.
+  - Model ve UI katmanlarında DateTime parse işlemleri kaldırıldı.
+  - Backend tarih sözleşmesine (ISO string) dokunulmadı.
+- Git:
+  - Commit ve push tamamlandı.
+
+### CHECKPOINT #25 — Push Notification Altyapısı (Owner: Token Kaydı)
+- Amaç:
+  - Owner kullanıcılar için push token’larının backend’e kaydedilmesi
+- Kapsam:
+  - user_push_tokens tablosu
+  - User ↔ PushToken ilişkisi
+  - POST /api/user/push-id endpoint’i
+- Not:
+  - Bu checkpoint sadece token kayıt altyapısını kapsar
+  - Push gönderimi bu checkpoint’te YOK
+
+### CHECKPOINT #25 — Push Notification Altyapısı (Owner: Token Kaydı)
+- Durum: TAMAMLANDI
+- Tamamlananlar:
+  - user_push_tokens tablosu oluşturuldu
+  - User ↔ PushToken ilişkisi eklendi
+  - POST /api/user/push-id endpoint’i eklendi
+  - FormRequest tabanlı validation uygulandı
+  - Namespace ve route disiplini sağlandı
+- Not:
+  - Bu checkpoint yalnızca token kayıt altyapısını kapsar
+  - Push gönderimi bu aşamada YOK
 
 ### [2025-12-28] Owner Dashboard için Latest Message endpoint’i ve bütünleşik test
 - Ne değişti:
@@ -1501,7 +1544,6 @@ git commit -m "Initial commit: ArvonCode Car NFC API backend"
 - [x] Quick Messages
 - [x] Public Vehicle Profile
 - [x] Location save (guest)
-- [ ] Owner inbox (messages)
 
 ### Beta (Phase 2)
 - [ ] Push notification (Firebase)
