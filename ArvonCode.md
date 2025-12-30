@@ -1082,6 +1082,11 @@ Teknik Not:
 - Not:
   - Bu checkpoint yalnızca ortam hazırlığını kapsar
   - Firebase / Push gönderimi bu checkpoint’te YOK
+- Yapılanlar:
+  - Backend için `.env.staging` dosyası oluşturuldu
+  - Staging ve prod environment ayrımı netleştirildi
+- Test:
+  - APP_ENV=staging ile Laravel config cache başarıyla oluşturuldu
 
 ### [2025-12-28] Owner Dashboard için Latest Message endpoint’i ve bütünleşik test
 - Ne değişti:
