@@ -2,6 +2,8 @@
 
 namespace App\Http\Middleware;
 
+use App\Exceptions\Handler;
+use App\Models\PublicRequestLog;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,25 +21,36 @@ class PublicRequestLogger
             $request->route('vehicle_uuid')
             ?? $request->input('vehicle_uuid');
 
-        $response = $next($request);
+        try {
+            $response = $next($request);
+        } catch (\Throwable $e) {
+            // Exception durumlarını da loglayabilmek için Handler üzerinden response üret.
+            app(Handler::class)->report($e);
+            $response = app(Handler::class)->render($request, $e);
+        }
+
+        $payload = [];
+        if (method_exists($response, 'getContent')) {
+            $payload = json_decode($response->getContent(), true) ?: [];
+        }
+
+        $ok = (bool)($payload['ok'] ?? ($response->getStatusCode() < 400));
+        $errorCode = $payload['error_code'] ?? null;
+        if (!$errorCode && $response->getStatusCode() === 429 && str_starts_with(ltrim($request->path(), '/'), 'api/public')) {
+            $errorCode = 'PUBLIC_RATE_LIMIT';
+        }
 
         try {
-            $payload = null;
-            // JSON response ise ok alanını yakala
-            if (method_exists($response, 'getContent')) {
-                $content = $response->getContent();
-                $payload = json_decode($content, true);
-            }
-
-            \App\Models\PublicRequestLog::create([
+            PublicRequestLog::create([
                 'endpoint' => $request->path(),
                 'method' => $request->method(),
                 'ip' => $request->ip(),
-                'user_agent' => substr((string)$request->userAgent(), 0, 255),
+                'user_agent' => substr((string) $request->userAgent(), 0, 255),
                 'vehicle_uuid' => $vehicleUuid,
-                'ok' => (bool)($payload['ok'] ?? false),
+                'ok' => $ok,
                 'status_code' => $response->getStatusCode(),
-                'error_message' => isset($payload['ok']) && !$payload['ok'] ? ($payload['message'] ?? null) : null,
+                'error_code' => $errorCode,
+                'error_message' => $ok ? null : ($payload['message'] ?? null),
             ]);
         } catch (\Throwable $e) {
             // log başarısızsa request’i bozma

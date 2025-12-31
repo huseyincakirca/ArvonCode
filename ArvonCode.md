@@ -29,13 +29,13 @@ aktif referans DEĞİLDİR.
 
 ## 🔵 AKTİF CHECKPOINT DURUMU
 
-Aktif checkpoint: Checkpoint #34 — AKTİF — Prod Auth Temizlik & Sertleştirme
+Aktif checkpoint: Checkpoint #35 — AKTİF — Public Güvenlik & Observability
 
 
 
 ---
 
-## 🟡 SIRADAKİ CHECKPOINT (KİLİTLİ — #35 ADAY)
+## 🟡 SIRADAKİ CHECKPOINT (KİLİTLİ — #36 ADAY)
 
 
 ### ⏭️ BİR SONRAKİ ADIMA ETKİSİ
@@ -56,6 +56,11 @@ Bu bölüm:
 - Silinmez
 - Değiştirilmez
 - Geriye dönük referans amaçlıdır
+
+### Public Security & Observability
+- public_request_logs tablosu ile public istekler (başarılı/başarısız) merkezi loglanır.
+- Public endpoint’ler context-aware rate limit (PUBLIC_RATE_LIMIT) altında çalışır.
+- Abuse analizi için lokal/staging’de okuma komutları tercih edilir; prod’da kapalıdır.
 
 ## 0) Kimlik
 
@@ -1162,7 +1167,7 @@ Teknik Not:
   - Rate limit ve validation davranışı testle doğrulanmış
 
 ### CHECKPOINT #34 — Prod Auth Temizlik & Sertleştirme
-- Durum: AKTİF
+- Durum: TAMAMLANDI
 - Amaç:
   - Auth mimarisini prod seviyesine taşımak
 - Kapsam:
@@ -1174,6 +1179,22 @@ Teknik Not:
   - Auth testleri SQLite ile yeşil
   - Logout sadece authenticated çalışıyor
   - Rate limit error_code context’e göre dönüyor
+
+### CHECKPOINT #35 — Public Güvenlik & Observability
+- Durum: AKTİF
+- Amaç:
+  - Public (auth’suz) endpoint’leri abuse/spam’e karşı prod seviyesinde sağlamlaştırmak
+- Kapsam:
+  - Public endpoint rate limit ve guard netleştirmeleri
+  - public_request_logs gerçek kullanımı (başarılı + hatalı istekler)
+  - Rate limit error_code context-aware (PUBLIC_RATE_LIMIT vs AUTH_RATE_LIMIT)
+  - Lokal/staging için read-only gözlem aracı
+- Kapsam dışı:
+  - Yeni endpoint ekleme, push notification, Flutter değişiklikleri
+- Çıkış kriteri:
+  - Public endpoint’ler context-aware rate limit ile duruyor
+  - public_request_logs başarı+validation+rate-limit+exception kayıtlarını içeriyor
+  - Auth testleri yeşil, endpoint sözleşmeleri korunuyor
 
 ### [2025-12-28] Owner Dashboard için Latest Message endpoint’i ve bütünleşik test
 - Ne değişti:

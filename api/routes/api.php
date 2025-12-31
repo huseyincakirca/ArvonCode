@@ -50,11 +50,20 @@ Route::middleware('auth:sanctum')->group(function () {
 
 // Public (Ziyaretçi) İşlemleri
 Route::prefix('public')
-    ->middleware(['throttle:public', 'public.log'])
+    ->middleware(['public.log', 'throttle:public.base'])
     ->group(function () {
-        Route::get('/quick-messages', [QuickMessageController::class, 'index']);
-        Route::post('/quick-message/send', [QuickMessageController::class, 'send']);
-        Route::get('/vehicle/{vehicle_uuid}', [PublicController::class, 'vehicleProfile']);
-        Route::post('/location/save', [LocationController::class, 'save']);
-        Route::post('/message', [PublicController::class, 'sendMessage']);
+        Route::get('/quick-messages', [QuickMessageController::class, 'index'])
+            ->middleware('throttle:public.quick-messages');
+
+        Route::post('/quick-message/send', [QuickMessageController::class, 'send'])
+            ->middleware('throttle:public.quick-message.send');
+
+        Route::get('/vehicle/{vehicle_uuid}', [PublicController::class, 'vehicleProfile'])
+            ->middleware('throttle:public.vehicle');
+
+        Route::post('/location/save', [LocationController::class, 'save'])
+            ->middleware('throttle:public.location');
+
+        Route::post('/message', [PublicController::class, 'sendMessage'])
+            ->middleware('throttle:public.message');
     });
