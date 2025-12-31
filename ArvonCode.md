@@ -29,7 +29,7 @@ aktif referans DEĞİLDİR.
 
 ## 🔵 AKTİF CHECKPOINT DURUMU
 
-Aktif checkpoint: Checkpoint #36 — AKTİF — Staging Validation
+Aktif checkpoint: Checkpoint #36 — TAMAMLANDI — Staging Environment Validation & Safety Net
 
 
 
@@ -1208,7 +1208,7 @@ Teknik Not:
   - api/app/Exceptions/Handler.php
 
 ### CHECKPOINT #36 — Staging Environment Validation & Safety Net
-- Durum: AKTİF
+- Durum: TAMAMLANDI
 - Amaç:
   - Staging ortamının prod’a zarar vermeyecek şekilde izole olduğunu doğrulamak
 - Kapsam:
@@ -1222,6 +1222,10 @@ Teknik Not:
   - Yeni endpoint
 - Test sonucu:
   - `php artisan test (staging env)` → PASS
+- Staging doğrulama:
+  - Staging MySQL bağlantısı doğrulandı
+  - Migration + seeder staging DB üzerinde başarıyla çalıştı
+  - public_request_logs staging ortamda canlı veri alıyor
 
 ### [2025-12-28] Owner Dashboard için Latest Message endpoint’i ve bütünleşik test
 - Ne değişti:
