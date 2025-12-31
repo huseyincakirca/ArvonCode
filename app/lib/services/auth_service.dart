@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 
 import '../config/api_config.dart';
 import 'auth_storage.dart';
+import 'push_token_service.dart';
 
 class AuthService {
   Future<String> login({
@@ -39,6 +40,7 @@ class AuthService {
 
     final token = data['token'].toString();
     await AuthStorage.saveToken(token);
+    await PushTokenService.instance.syncToken(token);
     return token;
   }
 

@@ -29,7 +29,7 @@ aktif referans DEĞİLDİR.
 
 ## 🔵 AKTİF CHECKPOINT DURUMU
 
-Aktif checkpoint: Checkpoint #38 — DEVAM EDİYOR — Flutter Push Notification Handling (MVP)
+Aktif checkpoint: Checkpoint #39 — DEVAM EDİYOR — Push Stabilizasyonu & UX İyileştirme
 
 
 ## 🗂 ARŞİV – TARİHSEL TEKNİK NOTLAR
@@ -1227,6 +1227,20 @@ Teknik Not:
   - Flutter push handling bu checkpoint’te yok
 - Test:
   - php artisan test → PASS
+
+### CHECKPOINT #38 — Flutter Push Notification Handling (MVP)
+- Durum: TAMAMLANDI
+- Tamamlanan:
+  - Firebase Flutter entegrasyonu (Android + iOS)
+  - Push token alma ve backend’e gönderme
+  - Foreground / background / killed state ayrımı
+  - Push payload ile doğru ekrana yönlendirme (vehicle_uuid)
+- Kapsam dışı:
+  - Bildirim tasarımı
+  - Topic / segment
+  - Analytics
+- Test:
+  - Android gerçek cihazda foreground / background / killed test edildi
 
 ### [2025-12-28] Owner Dashboard için Latest Message endpoint’i ve bütünleşik test
 - Ne değişti:
