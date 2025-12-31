@@ -5,6 +5,7 @@ namespace Tests\Feature\Auth;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\RateLimiter;
 use Tests\TestCase;
 
 class LoginTest extends TestCase
@@ -69,6 +70,9 @@ class LoginTest extends TestCase
 
     public function test_login_rate_limit_is_applied(): void
     {
+        $signature = sha1('|127.0.0.1');
+        RateLimiter::clear($signature);
+
         User::factory()->create([
             'email' => 'ratelimit@example.com',
             'password' => Hash::make('correct-password'),
@@ -96,6 +100,12 @@ class LoginTest extends TestCase
             'Accept' => 'application/json',
         ]);
 
-        $response->assertStatus(429);
+        $response->assertStatus(429)
+            ->assertJson([
+                'ok' => false,
+                'error_code' => 'AUTH_RATE_LIMIT',
+            ]);
+
+        RateLimiter::clear($signature);
     }
 }

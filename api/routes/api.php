@@ -42,7 +42,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/parking/delete/{id}', [ParkingController::class, 'deleteParking']);
 
     // Auth
-    Route::post('/logout', [AuthController::class, 'logout'])->withoutMiddleware('auth:sanctum');
+    Route::post('/logout', [AuthController::class, 'logout']);
 
     // Push Notification ID Kaydetme
     Route::post('/user/push-id', [UserPushTokenController::class, 'store']);

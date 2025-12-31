@@ -63,6 +63,8 @@ return [
 
     'token_prefix' => env('SANCTUM_TOKEN_PREFIX', ''),
 
+    // Token names are issued via createToken('auth-token'); pruning will be handled via a scheduled task.
+
     /*
     |--------------------------------------------------------------------------
     | Sanctum Middleware

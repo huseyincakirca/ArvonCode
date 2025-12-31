@@ -29,13 +29,13 @@ aktif referans DEĞİLDİR.
 
 ## 🔵 AKTİF CHECKPOINT DURUMU
 
-Aktif checkpoint: Checkpoint #33 — AKTİF — Auth Edge Case & Security Netleştirme
+Aktif checkpoint: Checkpoint #34 — AKTİF — Prod Auth Temizlik & Sertleştirme
 
 
 
 ---
 
-## 🟡 SIRADAKİ CHECKPOINT (KİLİTLİ — #34 ADAY)
+## 🟡 SIRADAKİ CHECKPOINT (KİLİTLİ — #35 ADAY)
 
 
 ### ⏭️ BİR SONRAKİ ADIMA ETKİSİ
@@ -1150,7 +1150,7 @@ Teknik Not:
   - docs/api.md auth endpoint listesi logout ile tutarlı
 
 ### CHECKPOINT #33 — Auth Edge Case & Security Netleştirme
-- Durum: AKTİF
+- Durum: TAMAMLANDI
 - Amaç:
   - Auth akışını edge-case ve saldırı senaryolarına karşı sağlamlaştırmak
 - Kapsam:
@@ -1160,6 +1160,20 @@ Teknik Not:
 - Çıkış kriteri:
   - Tüm auth feature testleri yeşil
   - Rate limit ve validation davranışı testle doğrulanmış
+
+### CHECKPOINT #34 — Prod Auth Temizlik & Sertleştirme
+- Durum: AKTİF
+- Amaç:
+  - Auth mimarisini prod seviyesine taşımak
+- Kapsam:
+  - Logout route mimari temizliği
+  - Context-aware rate limit
+  - Test DB izolasyonu (SQLite in-memory)
+  - Auth boundary netleştirme
+- Çıkış kriteri:
+  - Auth testleri SQLite ile yeşil
+  - Logout sadece authenticated çalışıyor
+  - Rate limit error_code context’e göre dönüyor
 
 ### [2025-12-28] Owner Dashboard için Latest Message endpoint’i ve bütünleşik test
 - Ne değişti:

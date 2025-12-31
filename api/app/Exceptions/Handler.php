@@ -2,6 +2,7 @@
 
 namespace App\Exceptions;
 
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Validation\ValidationException;
@@ -33,10 +34,26 @@ class Handler extends ExceptionHandler
     public function render($request, Throwable $e)
     {
         if ($e instanceof ThrottleRequestsException) {
+            $path = ltrim($request->path(), '/');
+            $isLogin = str_starts_with($path, 'api/login') || str_starts_with($path, 'api/register') || str_starts_with($path, 'api/logout');
+            $isPublic = str_starts_with($path, 'api/public');
+
+            if ($isLogin) {
+                $message = 'Too many login attempts';
+                $errorCode = 'AUTH_RATE_LIMIT';
+            } elseif ($isPublic) {
+                $message = 'Too many requests';
+                $errorCode = 'PUBLIC_RATE_LIMIT';
+            } else {
+                $message = 'Too many requests';
+                $errorCode = 'RATE_LIMIT';
+            }
+
             return response()->json([
                 'ok' => false,
-                'message' => 'Too many requests',
-                'error_code' => 'RATE_LIMIT',
+                'message' => $message,
+                'error_code' => $errorCode,
+                'data' => new \stdClass(),
             ], 429);
         }
 
@@ -51,5 +68,15 @@ class Handler extends ExceptionHandler
             'errors' => $exception->errors(),
             'data' => new \stdClass(),
         ], $exception->status);
+    }
+
+    protected function unauthenticated($request, AuthenticationException $exception)
+    {
+        return response()->json([
+            'ok' => false,
+            'message' => 'Unauthenticated',
+            'error_code' => 'UNAUTHENTICATED',
+            'data' => new \stdClass(),
+        ], 401);
     }
 }

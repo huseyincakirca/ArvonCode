@@ -27,7 +27,7 @@ class AuthController extends Controller
             'password' => bcrypt($req->password)
         ]);
 
-        $token = $user->createToken('api')->plainTextToken;
+        $token = $user->createToken('auth-token')->plainTextToken;
 
         return response()->json([
             'ok' => true,
@@ -51,7 +51,7 @@ class AuthController extends Controller
 
         /** @var \App\Models\User $user */
         $user = Auth::user();
-        $token = $user->createToken('api')->plainTextToken;
+        $token = $user->createToken('auth-token')->plainTextToken;
 
         return response()->json([
             'ok' => true,

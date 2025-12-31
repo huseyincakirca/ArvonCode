@@ -49,10 +49,9 @@ class LogoutTest extends TestCase
 
         $this->assertDatabaseCount('personal_access_tokens', 0);
 
-        $this->refreshApplication();
-        config()->set('sanctum.stateful', []);
-        config()->set('sanctum.guard', []);
-        $this->withoutMiddleware(EnsureFrontendRequestsAreStateful::class);
+        $this->defaultCookies = [];
+        $this->unencryptedCookies = [];
+        app('auth')->forgetGuards();
 
         $protectedResponse = $this->withServerVariables([
             'HTTP_HOST' => 'api-token.test',
@@ -64,7 +63,7 @@ class LogoutTest extends TestCase
         $protectedResponse->assertStatus(401);
     }
 
-    public function test_logout_can_be_called_twice_safely(): void
+    public function test_logout_is_not_allowed_without_valid_token(): void
     {
         config()->set('sanctum.stateful', []);
         config()->set('sanctum.guard', []);
@@ -97,15 +96,19 @@ class LogoutTest extends TestCase
                 'message' => 'Logged out',
             ]);
 
+        $this->defaultCookies = [];
+        $this->unencryptedCookies = [];
+        app('auth')->forgetGuards();
+
         $second = $this->postJson('/api/logout', [], [
             'Accept' => 'application/json',
             'Authorization' => "Bearer {$token}",
         ]);
 
-        $second->assertStatus(200)
+        $second->assertStatus(401)
             ->assertJson([
-                'ok' => true,
-                'message' => 'Logged out',
+                'ok' => false,
+                'error_code' => 'UNAUTHENTICATED',
             ]);
     }
 }
