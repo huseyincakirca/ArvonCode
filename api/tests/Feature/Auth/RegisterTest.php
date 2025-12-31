@@ -15,6 +15,7 @@ class RegisterTest extends TestCase
             'name' => 'Test User',
             'email' => 'register@example.com',
             'password' => 'password123',
+            'password_confirmation' => 'password123',
         ];
 
         $response = $this->postJson('/api/register', $payload, [
@@ -37,5 +38,25 @@ class RegisterTest extends TestCase
         $this->assertIsString($response->json('data.token'));
         $this->assertNotEmpty($response->json('data.token'));
         $this->assertEquals($payload['email'], $response->json('data.user.email'));
+    }
+
+    public function test_register_requires_password_confirmation(): void
+    {
+        $payload = [
+            'name' => 'No Confirm',
+            'email' => 'noconfirm@example.com',
+            'password' => 'password123',
+        ];
+
+        $response = $this->postJson('/api/register', $payload, [
+            'Accept' => 'application/json',
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJson([
+                'ok' => false,
+            ]);
+
+        $this->assertArrayHasKey('password', $response->json('errors'));
     }
 }

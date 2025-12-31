@@ -12,15 +12,18 @@ class AuthController extends Controller
 {
     public function register(Request $req)
     {
+        $normalizedEmail = strtolower((string) $req->input('email'));
+        $req->merge(['email' => $normalizedEmail]);
+
         $req->validate([
             'name' => 'required',
             'email' => 'required|email|unique:users',
-            'password' => 'required|min:6'
+            'password' => 'required|min:6|confirmed',
         ]);
 
         $user = User::create([
             'name' => $req->name,
-            'email' => $req->email,
+            'email' => $normalizedEmail,
             'password' => bcrypt($req->password)
         ]);
 
@@ -80,7 +83,8 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        $token = $request->user()->currentAccessToken();
+        $user = $request->user();
+        $token = $user?->currentAccessToken();
         if ($token instanceof PersonalAccessToken) {
             $token->delete();
         } elseif ($request->bearerToken()) {

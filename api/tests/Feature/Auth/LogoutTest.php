@@ -63,4 +63,49 @@ class LogoutTest extends TestCase
 
         $protectedResponse->assertStatus(401);
     }
+
+    public function test_logout_can_be_called_twice_safely(): void
+    {
+        config()->set('sanctum.stateful', []);
+        config()->set('sanctum.guard', []);
+        $this->withoutMiddleware(EnsureFrontendRequestsAreStateful::class);
+
+        $password = 'double-logout';
+
+        User::factory()->create([
+            'email' => 'doublelogout@example.com',
+            'password' => Hash::make($password),
+        ]);
+
+        $loginResponse = $this->postJson('/api/login', [
+            'email' => 'doublelogout@example.com',
+            'password' => $password,
+        ], [
+            'Accept' => 'application/json',
+        ]);
+
+        $token = $loginResponse->json('data.token');
+
+        $first = $this->postJson('/api/logout', [], [
+            'Accept' => 'application/json',
+            'Authorization' => "Bearer {$token}",
+        ]);
+
+        $first->assertStatus(200)
+            ->assertJson([
+                'ok' => true,
+                'message' => 'Logged out',
+            ]);
+
+        $second = $this->postJson('/api/logout', [], [
+            'Accept' => 'application/json',
+            'Authorization' => "Bearer {$token}",
+        ]);
+
+        $second->assertStatus(200)
+            ->assertJson([
+                'ok' => true,
+                'message' => 'Logged out',
+            ]);
+    }
 }

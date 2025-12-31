@@ -29,13 +29,13 @@ aktif referans DEĞİLDİR.
 
 ## 🔵 AKTİF CHECKPOINT DURUMU
 
-Aktif checkpoint: Checkpoint #32 — AKTİF — Backend Auth Otomatik Test Paketi
+Aktif checkpoint: Checkpoint #33 — AKTİF — Auth Edge Case & Security Netleştirme
 
 
 
 ---
 
-## 🟡 SIRADAKİ CHECKPOINT (KİLİTLİ — #33 ADAY)
+## 🟡 SIRADAKİ CHECKPOINT (KİLİTLİ — #34 ADAY)
 
 
 ### ⏭️ BİR SONRAKİ ADIMA ETKİSİ
@@ -1140,7 +1140,7 @@ Teknik Not:
   - response standardizasyonu tamamlandı, test aşamasına hazır
 
 ### CHECKPOINT #32 — Backend Auth Otomatik Test Paketi
-- Durum: AKTİF
+- Durum: TAMAMLANDI
 - Amaç:
   - Auth sözleşmesini (register/login/logout) otomatik test ile kilitlemek
 - Kapsam:
@@ -1148,6 +1148,18 @@ Teknik Not:
 - Çıkış kriteri:
   - Tüm testler yeşil (php artisan test / proje test komutu)
   - docs/api.md auth endpoint listesi logout ile tutarlı
+
+### CHECKPOINT #33 — Auth Edge Case & Security Netleştirme
+- Durum: AKTİF
+- Amaç:
+  - Auth akışını edge-case ve saldırı senaryolarına karşı sağlamlaştırmak
+- Kapsam:
+  - Register email normalize + password confirmation
+  - Login rate limit (bruteforce koruması)
+  - Logout idempotency (çift logout güvenliği)
+- Çıkış kriteri:
+  - Tüm auth feature testleri yeşil
+  - Rate limit ve validation davranışı testle doğrulanmış
 
 ### [2025-12-28] Owner Dashboard için Latest Message endpoint’i ve bütünleşik test
 - Ne değişti:

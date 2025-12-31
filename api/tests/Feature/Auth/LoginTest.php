@@ -66,4 +66,36 @@ class LoginTest extends TestCase
 
         $this->assertSame([], $response->json('data'));
     }
+
+    public function test_login_rate_limit_is_applied(): void
+    {
+        User::factory()->create([
+            'email' => 'ratelimit@example.com',
+            'password' => Hash::make('correct-password'),
+        ]);
+
+        for ($i = 1; $i <= 5; $i++) {
+            $response = $this->postJson('/api/login', [
+                'email' => 'ratelimit@example.com',
+                'password' => 'wrong-password',
+            ], [
+                'Accept' => 'application/json',
+            ]);
+
+            $response->assertStatus(401)
+                ->assertJson([
+                    'ok' => false,
+                    'message' => 'Invalid credentials',
+                ]);
+        }
+
+        $response = $this->postJson('/api/login', [
+            'email' => 'ratelimit@example.com',
+            'password' => 'wrong-password',
+        ], [
+            'Accept' => 'application/json',
+        ]);
+
+        $response->assertStatus(429);
+    }
 }

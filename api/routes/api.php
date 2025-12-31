@@ -18,7 +18,7 @@ use App\Http\Controllers\Api\UserPushTokenController;
 
 // Auth İşlemleri
 Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
 
 // Korumalı Alan (Sadece giriş yapmış kullanıcılar)
 Route::middleware('auth:sanctum')->group(function () {
@@ -42,7 +42,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/parking/delete/{id}', [ParkingController::class, 'deleteParking']);
 
     // Auth
-    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::post('/logout', [AuthController::class, 'logout'])->withoutMiddleware('auth:sanctum');
 
     // Push Notification ID Kaydetme
     Route::post('/user/push-id', [UserPushTokenController::class, 'store']);
