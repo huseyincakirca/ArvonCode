@@ -1205,7 +1205,6 @@ Teknik Not:
   - api/app/Providers/RouteServiceProvider.php
   - api/routes/api.php
   - api/app/Console/Commands/ShowPublicRequestLogs.php
-  - api/app/Exceptions/Handler.php
 
 ### CHECKPOINT #36 — Staging Environment Validation & Safety Net
 - Durum: TAMAMLANDI
@@ -1219,7 +1218,6 @@ Teknik Not:
 - Kapsam dışı:
   - Push notification
   - CI / Docker
-  - Yeni endpoint
 - Test sonucu:
   - `php artisan test (staging env)` → PASS
 - Staging doğrulama:
