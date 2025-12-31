@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Vehicle;   // <-- EKSİKTİ
 use App\Models\Location;
 use App\Http\Requests\PublicLocationSaveRequest;
+use App\Events\OwnerNotifiableEvent;
 
 
 class LocationController extends Controller
@@ -35,6 +36,15 @@ class LocationController extends Controller
             'accuracy'   => $validated['accuracy'] ?? null,
             'source'     => 'guest_qr',
         ]);
+
+        if ($vehicle->user_id) {
+            event(new OwnerNotifiableEvent(
+                $vehicle->user_id,
+                'location',
+                $vehicle->id,
+                $location->created_at->toISOString()
+            ));
+        }
 
         return response()->json([
             'ok' => true,

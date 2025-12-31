@@ -29,7 +29,7 @@ aktif referans DEĞİLDİR.
 
 ## 🔵 AKTİF CHECKPOINT DURUMU
 
-Aktif checkpoint: Checkpoint #36 — TAMAMLANDI — Staging Environment Validation & Safety Net
+Aktif checkpoint: Checkpoint #37 — DEVAM EDİYOR — Owner Push Notification (MVP)
 
 
 
@@ -1224,6 +1224,13 @@ Teknik Not:
   - Staging MySQL bağlantısı doğrulandı
   - Migration + seeder staging DB üzerinde başarıyla çalıştı
   - public_request_logs staging ortamda canlı veri alıyor
+
+### CHECKPOINT #37 — Owner Push Notification (MVP)
+- Durum: DEVAM EDİYOR
+- Amaç:
+  - Guest message & location sonrası owner’a push gönderimi
+  - Event/Listener mimarisi kullanıldı
+  - Push token kayıt altyapısı (#25) aktif kullanıma alındı
 
 ### [2025-12-28] Owner Dashboard için Latest Message endpoint’i ve bütünleşik test
 - Ne değişti:

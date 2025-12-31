@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Vehicle;
 use App\Models\QuickMessage;
+use App\Events\OwnerNotifiableEvent;
 
 class PublicController extends Controller
 {
@@ -39,6 +40,15 @@ class PublicController extends Controller
             'phone' => $validated['phone'] ?? null,
             'sender_ip' => $request->ip(),
         ]);
+
+        if ($vehicle->user_id) {
+            event(new OwnerNotifiableEvent(
+                $vehicle->user_id,
+                'message',
+                $vehicle->id,
+                $message->created_at->toISOString()
+            ));
+        }
 
         // 4️⃣ Standart response
         return response()->json([
