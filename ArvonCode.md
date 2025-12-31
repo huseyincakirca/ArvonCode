@@ -29,7 +29,7 @@ aktif referans DEĞİLDİR.
 
 ## 🔵 AKTİF CHECKPOINT DURUMU
 
-Aktif checkpoint: Checkpoint #35 — AKTİF — Public Güvenlik & Observability
+Aktif checkpoint: Checkpoint #36 — AKTİF — Staging Validation
 
 
 
@@ -61,6 +61,7 @@ Bu bölüm:
 - public_request_logs tablosu ile public istekler (başarılı/başarısız) merkezi loglanır.
 - Public endpoint’ler context-aware rate limit (PUBLIC_RATE_LIMIT) altında çalışır.
 - Abuse analizi için lokal/staging’de okuma komutları tercih edilir; prod’da kapalıdır.
+- PublicRequestLogger log yazarken hata alırsa, request akışını bozmamak için exception yutar (bilinçli tercih: observability kaybı servis sürekliliğine tercih edilir).
 
 ## 0) Kimlik
 
@@ -1181,7 +1182,7 @@ Teknik Not:
   - Rate limit error_code context’e göre dönüyor
 
 ### CHECKPOINT #35 — Public Güvenlik & Observability
-- Durum: AKTİF
+- Durum: TAMAMLANDI
 - Amaç:
   - Public (auth’suz) endpoint’leri abuse/spam’e karşı prod seviyesinde sağlamlaştırmak
 - Kapsam:
@@ -1195,6 +1196,32 @@ Teknik Not:
   - Public endpoint’ler context-aware rate limit ile duruyor
   - public_request_logs başarı+validation+rate-limit+exception kayıtlarını içeriyor
   - Auth testleri yeşil, endpoint sözleşmeleri korunuyor
+  - SQLite test izolasyonu doğrulandı
+  - Rate limit error_code tek merkezden yönetiliyor
+- Test sonucu:
+  - `php artisan test (SQLite in-memory)` → PASS
+- Etkilenen dosyalar:
+  - api/app/Http/Middleware/PublicRequestLogger.php
+  - api/app/Providers/RouteServiceProvider.php
+  - api/routes/api.php
+  - api/app/Console/Commands/ShowPublicRequestLogs.php
+  - api/app/Exceptions/Handler.php
+
+### CHECKPOINT #36 — Staging Environment Validation & Safety Net
+- Durum: AKTİF
+- Amaç:
+  - Staging ortamının prod’a zarar vermeyecek şekilde izole olduğunu doğrulamak
+- Kapsam:
+  - APP_ENV / DEBUG doğrulaması
+  - Staging DB izolasyon kilidi
+  - Auth + Public smoke test
+  - Observability doğrulaması
+- Kapsam dışı:
+  - Push notification
+  - CI / Docker
+  - Yeni endpoint
+- Test sonucu:
+  - `php artisan test (staging env)` → PASS
 
 ### [2025-12-28] Owner Dashboard için Latest Message endpoint’i ve bütünleşik test
 - Ne değişti:
