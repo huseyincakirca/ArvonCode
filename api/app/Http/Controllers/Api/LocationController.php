@@ -41,7 +41,7 @@ class LocationController extends Controller
             event(new OwnerNotifiableEvent(
                 $vehicle->user_id,
                 'location',
-                $vehicle->id,
+                $vehicle->vehicle_id,
                 $location->created_at->toISOString()
             ));
         }

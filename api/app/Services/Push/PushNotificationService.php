@@ -9,15 +9,15 @@ class PushNotificationService
 {
     private const FCM_ENDPOINT = 'https://fcm.googleapis.com/fcm/send';
 
-    public function sendToToken(string $token, string $type, int $vehicleId, string $createdAt): void
+    public function sendToToken(string $token, string $type, string $vehicleUuid, string $createdAt): void
     {
-        $serverKey = env('FCM_SERVER_KEY');
+        $serverKey = config('services.fcm.server_key');
 
         if (empty($serverKey)) {
             Log::warning('FCM_SERVER_KEY is not set; skipping push notification.', [
                 'token' => $token,
                 'type' => $type,
-                'vehicle_id' => $vehicleId,
+                'vehicle_uuid' => $vehicleUuid,
             ]);
             return;
         }
@@ -30,7 +30,7 @@ class PushNotificationService
             ],
             'data' => [
                 'type' => $type,
-                'vehicle_id' => $vehicleId,
+                'vehicle_uuid' => $vehicleUuid,
                 'created_at' => $createdAt,
             ],
         ];
@@ -46,9 +46,16 @@ class PushNotificationService
                 'body' => $response->body(),
                 'token' => $token,
                 'type' => $type,
-                'vehicle_id' => $vehicleId,
+                'vehicle_uuid' => $vehicleUuid,
             ]);
             $response->throw();
         }
+
+        Log::info('FCM push sent', [
+            'token' => $token,
+            'type' => $type,
+            'vehicle_uuid' => $vehicleUuid,
+            'note' => 'Using FCM legacy HTTP API (known technical debt)',
+        ]);
     }
 }

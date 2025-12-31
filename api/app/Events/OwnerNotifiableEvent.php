@@ -11,14 +11,14 @@ class OwnerNotifiableEvent
 
     public int $ownerId;
     public string $type;
-    public int $vehicleId;
+    public string $vehicleUuid;
     public string $createdAt;
 
-    public function __construct(int $ownerId, string $type, int $vehicleId, string $createdAt)
+    public function __construct(int $ownerId, string $type, string $vehicleUuid, string $createdAt)
     {
         $this->ownerId = $ownerId;
         $this->type = $type;
-        $this->vehicleId = $vehicleId;
+        $this->vehicleUuid = $vehicleUuid;
         $this->createdAt = $createdAt;
     }
 }

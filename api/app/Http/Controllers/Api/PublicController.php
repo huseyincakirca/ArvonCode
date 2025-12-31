@@ -45,7 +45,7 @@ class PublicController extends Controller
             event(new OwnerNotifiableEvent(
                 $vehicle->user_id,
                 'message',
-                $vehicle->id,
+                $vehicle->vehicle_id,
                 $message->created_at->toISOString()
             ));
         }

@@ -29,18 +29,7 @@ aktif referans DEĞİLDİR.
 
 ## 🔵 AKTİF CHECKPOINT DURUMU
 
-Aktif checkpoint: Checkpoint #37 — DEVAM EDİYOR — Owner Push Notification (MVP)
-
-
-
----
-
-## 🟡 SIRADAKİ CHECKPOINT (KİLİTLİ — #36 ADAY)
-
-
-### ⏭️ BİR SONRAKİ ADIMA ETKİSİ
-
-Staging ortam tamamlanmadan prod veya push notification adımlarına geçilmez.
+Aktif checkpoint: Checkpoint #38 — DEVAM EDİYOR — Flutter Push Notification Handling (MVP)
 
 
 ## 🗂 ARŞİV – TARİHSEL TEKNİK NOTLAR
@@ -1226,11 +1215,18 @@ Teknik Not:
   - public_request_logs staging ortamda canlı veri alıyor
 
 ### CHECKPOINT #37 — Owner Push Notification (MVP)
-- Durum: DEVAM EDİYOR
-- Amaç:
+- Durum: TAMAMLANDI
+- Tamamlanan:
   - Guest message & location sonrası owner’a push gönderimi
-  - Event/Listener mimarisi kullanıldı
-  - Push token kayıt altyapısı (#25) aktif kullanıma alındı
+  - Event → Listener → PushService mimarisi
+  - Push token kayıt altyapısı (#25) aktif kullanıldı
+  - Push payload standardize edildi (vehicle_uuid)
+- Bilinçli teknik borçlar:
+  - FCM legacy HTTP API kullanılıyor
+  - Push işlemleri sync çalışıyor (queue yok)
+  - Flutter push handling bu checkpoint’te yok
+- Test:
+  - php artisan test → PASS
 
 ### [2025-12-28] Owner Dashboard için Latest Message endpoint’i ve bütünleşik test
 - Ne değişti:
