@@ -29,18 +29,17 @@ aktif referans DEĞİLDİR.
 
 ## 🔵 AKTİF CHECKPOINT DURUMU
 
-Aktif checkpoint: Checkpoint #31 — AKTİF — Auth dayanıklılık & test hazırlığı
+Aktif checkpoint: Checkpoint #32 — AKTİF — Backend Auth Otomatik Test Paketi
 
 
 
 ---
 
-## 🟡 SIRADAKİ CHECKPOINT (KİLİTLİ — #32 ADAY)
+## 🟡 SIRADAKİ CHECKPOINT (KİLİTLİ — #33 ADAY)
 
 
 ### ⏭️ BİR SONRAKİ ADIMA ETKİSİ
 
-Staging ortam tamamlanmadan prod veya push notification adımlarına geçilmez.
 Staging ortam tamamlanmadan prod veya push notification adımlarına geçilmez.
 
 
@@ -1124,7 +1123,7 @@ Teknik Not:
   - Auth endpoint’leri arasında response tutarsızlığı giderildi
 
 ### CHECKPOINT #31 — Auth Dayanıklılık & Test Hazırlığı
-- Durum: AKTİF
+- Durum: TAMAMLANDI
 - Yapılanlar:
   - Backend genelinde namespace / use / model typing hijyeni yapıldı
   - Static analyzer (Intelephense) false-positive hataları temizlendi
@@ -1139,6 +1138,16 @@ Teknik Not:
   - Laravel Auth facade içindeki providerIsLoaded Intelephense false-positive’i IDE seviyesinde bilinçli olarak susturuldu (vendor/framework koduna müdahale edilmedi)
 - Not:
   - response standardizasyonu tamamlandı, test aşamasına hazır
+
+### CHECKPOINT #32 — Backend Auth Otomatik Test Paketi
+- Durum: AKTİF
+- Amaç:
+  - Auth sözleşmesini (register/login/logout) otomatik test ile kilitlemek
+- Kapsam:
+  - Feature test: register, login, login negatif, logout, token invalidasyonu
+- Çıkış kriteri:
+  - Tüm testler yeşil (php artisan test / proje test komutu)
+  - docs/api.md auth endpoint listesi logout ile tutarlı
 
 ### [2025-12-28] Owner Dashboard için Latest Message endpoint’i ve bütünleşik test
 - Ne değişti:

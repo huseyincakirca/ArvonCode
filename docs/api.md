@@ -8,6 +8,8 @@ POST   /api/login
 
 ## AUTHENTICATED (auth:sanctum)
 
+POST   /api/logout
+
 ### Vehicle
 POST   /api/vehicle/activate
 GET    /api/vehicle/my
@@ -38,9 +40,3 @@ GET    /api/public/quick-messages
 POST   /api/public/quick-message/send
 POST   /api/public/message
 POST   /api/public/location/save
-
----
-
-## LEGACY (Dokümante edilmez)
-GET    /api/v/{tag}
-POST   /api/v/{tag}/message

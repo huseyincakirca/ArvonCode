@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
+use Laravel\Sanctum\PersonalAccessToken;
 
 class AuthController extends Controller
 {
@@ -80,8 +81,19 @@ class AuthController extends Controller
     public function logout(Request $request)
     {
         $token = $request->user()->currentAccessToken();
-        if ($token) {
+        if ($token instanceof PersonalAccessToken) {
             $token->delete();
+        } elseif ($request->bearerToken()) {
+            $personalToken = PersonalAccessToken::findToken($request->bearerToken());
+            if ($personalToken) {
+                $personalToken->delete();
+            }
+        }
+
+        if ($request->hasSession()) {
+            auth()->guard('web')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
         }
 
         return response()->json([
