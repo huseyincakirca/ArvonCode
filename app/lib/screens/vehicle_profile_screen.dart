@@ -4,7 +4,10 @@ import '../config/api_config.dart';
 import '../services/quick_message_service.dart';
 import '../services/location_service.dart';
 import '../services/device_location_service.dart';
+import '../services/parking_service.dart';
+import '../services/auth_storage.dart';
 import 'send_custom_message_screen.dart';
+import 'owner/parking_page.dart';
 
 class VehicleProfileScreen extends StatefulWidget {
   final String vehicleUuid;
@@ -21,6 +24,7 @@ class _VehicleProfileScreenState extends State<VehicleProfileScreen> {
   final Map<int, DateTime> _lastSentAt = {};
   static const Duration _cooldown = Duration(seconds: 2);
   DateTime? _lastLocationSentAt;
+  bool _parkingPrompted = false;
 
   // 2. State içine eklenecek değişkenler
   bool _isLocationSending = false;
@@ -146,6 +150,79 @@ class _VehicleProfileScreenState extends State<VehicleProfileScreen> {
     await _sendCurrentLocation();
   }
 
+  Future<void> _maybePromptParkingForOwner() async {
+    if (_parkingPrompted) return;
+
+    final token = (await AuthStorage.getToken())?.trim();
+    if (token == null || token.isEmpty) return;
+
+    try {
+      await ParkingService.fetchLatestParking(
+        token: token,
+        vehicleId: widget.vehicleUuid,
+      );
+    } on ParkingApiException catch (e) {
+      if (e.statusCode == 401 || e.statusCode == 403) {
+        return;
+      }
+    } catch (_) {
+      return;
+    }
+
+    if (!mounted) return;
+    _parkingPrompted = true;
+
+    // ignore: use_build_context_synchronously
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Park konumunu kaydetmek ister misin?',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Bu işlem sadece araç sahibi tarafından yapılabilir. Onaylarsan park konumu kaydedilecek.',
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('Hayır'),
+                  ),
+                  const SizedBox(width: 12),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => ParkingPage(
+                            token: token,
+                            vehicleId: widget.vehicleUuid,
+                          ),
+                        ),
+                      );
+                    },
+                    child: const Text('Evet'),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   // ----------
 
   @override
@@ -191,6 +268,7 @@ class _VehicleProfileScreenState extends State<VehicleProfileScreen> {
             final String model = data['model'] ?? '-';
             final String color = data['color'] ?? '-';
             final List quickMessages = data['quick_messages'] ?? [];
+            _maybePromptParkingForOwner();
 
             return Column(
               crossAxisAlignment: CrossAxisAlignment.stretch, // Butonları yayar

@@ -3,6 +3,21 @@ import 'package:http/http.dart' as http;
 
 import '../config/api_config.dart';
 
+class ParkingApiException implements Exception {
+  final int statusCode;
+  final String body;
+  final String message;
+
+  ParkingApiException({
+    required this.statusCode,
+    required this.body,
+    required this.message,
+  });
+
+  @override
+  String toString() => 'ParkingApiException(status: $statusCode, message: $message)';
+}
+
 class ParkingService {
   static Future<Map<String, dynamic>> setParking({
     required String token,
@@ -77,20 +92,41 @@ class ParkingService {
   }
 
   static Map<String, dynamic> _parseResponse(http.Response res) {
+    Map<String, dynamic>? json;
+
+    try {
+      final decoded = jsonDecode(res.body);
+      if (decoded is Map) {
+        json = Map<String, dynamic>.from(decoded);
+      }
+    } catch (_) {
+      // fall through
+    }
+
     if (res.statusCode >= 400) {
-      throw Exception('HTTP ${res.statusCode}: ${res.body}');
+      final message =
+          json != null ? (json['message']?.toString() ?? 'API error') : 'HTTP ${res.statusCode}';
+      throw ParkingApiException(
+        statusCode: res.statusCode,
+        body: res.body,
+        message: message,
+      );
     }
 
-    final decoded = jsonDecode(res.body);
-
-    if (decoded is! Map) {
-      throw Exception('Invalid response format');
+    if (json == null) {
+      throw ParkingApiException(
+        statusCode: res.statusCode,
+        body: res.body,
+        message: 'Invalid response format',
+      );
     }
-
-    final Map<String, dynamic> json = Map<String, dynamic>.from(decoded);
 
     if (json['ok'] != true) {
-      throw Exception(json['message'] ?? 'Unknown API error');
+      throw ParkingApiException(
+        statusCode: res.statusCode,
+        body: res.body,
+        message: json['message']?.toString() ?? 'Unknown API error',
+      );
     }
 
     return json;

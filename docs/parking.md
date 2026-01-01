@@ -10,6 +10,7 @@
 
 ## Sahiplik Kontrolü
 - Her endpoint, `vehicles.user_id == auth()->id()` kontrolü yapar; değilse 403 döner.
+- Her araç için **tek aktif park kaydı** tutulur; yeni kayıt eskiyi günceller.
 
 ## Konum Kaydetme Onayı
 - Park kaydı; lat/lng + vehicle_id ile **owner token** üzerinden kaydedilir.

@@ -30,12 +30,14 @@ class ParkingController extends Controller
             ], 403);
         }
 
-        $parking = Parking::create([
-            'vehicle_id' => $vehicle->id,
-            'lat' => $req->lat,
-            'lng' => $req->lng,
-            'parked_at' => now()
-        ]);
+        $parking = Parking::updateOrCreate(
+            ['vehicle_id' => $vehicle->id],
+            [
+                'lat' => $req->lat,
+                'lng' => $req->lng,
+                'parked_at' => now(),
+            ]
+        );
 
         return response()->json([
             'ok' => true,

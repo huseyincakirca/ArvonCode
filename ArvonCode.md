@@ -36,7 +36,10 @@ aktif referans DEĞİLDİR.
   - docs/parking.md ile sözleşme kilitlendi
   - Flutter Parking service eklendi
   - Owner ParkingPage eklendi ve dashboard navigation bağlandı
-  - Test komutları çalıştırıldı (route:list, php artisan test, flutter analyze)
+  - Test komutları çalıştırıldı (route:list, php artisan test, flutter analyze ÇALIŞTIRILAMADI - Flutter SDK permission issue)
+
+#### Bilinçli Eksikler / Borçlar
+- Flutter Parking başlangıçta debug ekranıydı, ürün akışına bağlandı.
 
 ### Parking Feature — Ürün Senaryosu (Referans)
 - Owner, karttaki `vehicle_id` ile park konumunu kaydeder; kayıtlar yalnızca owner token ile okunur/silinir.

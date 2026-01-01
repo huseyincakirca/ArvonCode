@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 
+import '../../services/device_location_service.dart';
 import '../../services/parking_service.dart';
 import '../../utils/date_formatter.dart';
 
 class ParkingPage extends StatefulWidget {
   final String token;
-  final String? initialVehicleId;
+  final String vehicleId;
 
   const ParkingPage({
     super.key,
     required this.token,
-    this.initialVehicleId,
+    required this.vehicleId,
   });
 
   @override
@@ -18,12 +19,8 @@ class ParkingPage extends StatefulWidget {
 }
 
 class _ParkingPageState extends State<ParkingPage> {
-  final TextEditingController _vehicleIdController = TextEditingController();
-  final TextEditingController _latController = TextEditingController();
-  final TextEditingController _lngController = TextEditingController();
-
   bool _loadingLatest = false;
-  bool _submitting = false;
+  bool _saving = false;
   bool _deleting = false;
   String? _error;
   Map<String, dynamic>? _latestParking;
@@ -31,30 +28,10 @@ class _ParkingPageState extends State<ParkingPage> {
   @override
   void initState() {
     super.initState();
-    if (widget.initialVehicleId != null &&
-        widget.initialVehicleId!.trim().isNotEmpty) {
-      _vehicleIdController.text = widget.initialVehicleId!.trim();
-      _loadLatest();
-    }
-  }
-
-  @override
-  void dispose() {
-    _vehicleIdController.dispose();
-    _latController.dispose();
-    _lngController.dispose();
-    super.dispose();
+    _loadLatest();
   }
 
   Future<void> _loadLatest() async {
-    final vehicleId = _vehicleIdController.text.trim();
-    if (vehicleId.isEmpty) {
-      setState(() {
-        _error = 'Vehicle ID gerekli';
-      });
-      return;
-    }
-
     setState(() {
       _loadingLatest = true;
       _error = null;
@@ -63,47 +40,17 @@ class _ParkingPageState extends State<ParkingPage> {
     try {
       final parking = await ParkingService.fetchLatestParking(
         token: widget.token,
-        vehicleId: vehicleId,
+        vehicleId: widget.vehicleId,
       );
       if (!mounted) return;
       setState(() {
         _latestParking = parking;
-        _loadingLatest = false;
       });
-    } catch (e) {
+    } on ParkingApiException catch (e) {
       if (!mounted) return;
       setState(() {
-        _error = e.toString();
-        _loadingLatest = false;
+        _error = _friendlyError(e);
       });
-    }
-  }
-
-  Future<void> _setParking() async {
-    final vehicleId = _vehicleIdController.text.trim();
-    final lat = double.tryParse(_latController.text.trim());
-    final lng = double.tryParse(_lngController.text.trim());
-
-    if (vehicleId.isEmpty || lat == null || lng == null) {
-      setState(() {
-        _error = 'Vehicle ID, lat ve lng gerekli';
-      });
-      return;
-    }
-
-    setState(() {
-      _submitting = true;
-      _error = null;
-    });
-
-    try {
-      await ParkingService.setParking(
-        token: widget.token,
-        vehicleId: vehicleId,
-        lat: lat,
-        lng: lng,
-      );
-      await _loadLatest();
     } catch (e) {
       if (!mounted) return;
       setState(() {
@@ -112,22 +59,51 @@ class _ParkingPageState extends State<ParkingPage> {
     } finally {
       if (mounted) {
         setState(() {
-          _submitting = false;
+          _loadingLatest = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _saveParking() async {
+    setState(() {
+      _saving = true;
+      _error = null;
+    });
+
+    try {
+      final position = await DeviceLocationService.getCurrentLocation();
+      await ParkingService.setParking(
+        token: widget.token,
+        vehicleId: widget.vehicleId,
+        lat: position.latitude,
+        lng: position.longitude,
+      );
+      await _loadLatest();
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Park konumu kaydedildi.')),
+      );
+    } on ParkingApiException catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _error = _friendlyError(e);
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _error = _friendlyLocationError(e);
+      });
+    } finally {
+      if (mounted) {
+        setState(() {
+          _saving = false;
         });
       }
     }
   }
 
   Future<void> _deleteParking() async {
-    final vehicleId = _vehicleIdController.text.trim();
-
-    if (vehicleId.isEmpty) {
-      setState(() {
-        _error = 'Vehicle ID gerekli';
-      });
-      return;
-    }
-
     setState(() {
       _deleting = true;
       _error = null;
@@ -136,11 +112,19 @@ class _ParkingPageState extends State<ParkingPage> {
     try {
       await ParkingService.deleteParking(
         token: widget.token,
-        vehicleId: vehicleId,
+        vehicleId: widget.vehicleId,
       );
       if (!mounted) return;
       setState(() {
         _latestParking = null;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Park kaydı silindi.')),
+      );
+    } on ParkingApiException catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _error = _friendlyError(e);
       });
     } catch (e) {
       if (!mounted) return;
@@ -156,6 +140,30 @@ class _ParkingPageState extends State<ParkingPage> {
     }
   }
 
+  String _friendlyLocationError(Object e) {
+    final msg = e.toString().toLowerCase();
+    if (msg.contains('permission')) {
+      return 'Konum izni verilmedi. İzin verip tekrar dene.';
+    }
+    if (msg.contains('disabled') || msg.contains('service')) {
+      return 'Konum servisi kapalı. Açıp tekrar dene.';
+    }
+    return 'Konum alınamadı: $e';
+  }
+
+  String _friendlyError(ParkingApiException e) {
+    if (e.statusCode == 403) {
+      return 'Bu araç için yetkin yok (403).';
+    }
+    if (e.statusCode == 401) {
+      return 'Oturum geçersiz (401). Tekrar giriş yap.';
+    }
+    if (e.statusCode == 422) {
+      return 'Gönderilen bilgiler hatalı (422).';
+    }
+    return 'API hatası: ${e.message}';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -164,48 +172,18 @@ class _ParkingPageState extends State<ParkingPage> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
-        child: ListView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TextField(
-              controller: _vehicleIdController,
-              decoration: const InputDecoration(
-                labelText: 'Vehicle ID (vehicle_uuid)',
-                border: OutlineInputBorder(),
+            if (_error != null)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Text(
+                  _error!,
+                  style: const TextStyle(color: Colors.red),
+                ),
               ),
-              onSubmitted: (_) => _loadLatest(),
-            ),
-            const SizedBox(height: 12),
             Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _latController,
-                    decoration: const InputDecoration(
-                      labelText: 'Lat',
-                      border: OutlineInputBorder(),
-                    ),
-                    keyboardType:
-                        const TextInputType.numberWithOptions(decimal: true),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: TextField(
-                    controller: _lngController,
-                    decoration: const InputDecoration(
-                      labelText: 'Lng',
-                      border: OutlineInputBorder(),
-                    ),
-                    keyboardType:
-                        const TextInputType.numberWithOptions(decimal: true),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Wrap(
-              spacing: 12,
-              runSpacing: 12,
               children: [
                 ElevatedButton(
                   onPressed: _loadingLatest ? null : _loadLatest,
@@ -215,31 +193,34 @@ class _ParkingPageState extends State<ParkingPage> {
                           height: 16,
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
-                      : const Text('Son Parkı Getir'),
+                      : const Text('Son Park'),
                 ),
+                const SizedBox(width: 12),
                 ElevatedButton(
-                  onPressed: _submitting ? null : _setParking,
-                  child: _submitting
+                  onPressed: _saving ? null : _saveParking,
+                  child: _saving
                       ? const SizedBox(
                           width: 16,
                           height: 16,
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
-                      : const Text('Park Kaydet'),
+                      : const Text('Konumu Kaydet'),
                 ),
+                const SizedBox(width: 12),
                 ElevatedButton(
-                  onPressed: _deleting ? null : _deleteParking,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red,
                   ),
+                  onPressed: _deleting ? null : _deleteParking,
                   child: _deleting
                       ? const SizedBox(
                           width: 16,
                           height: 16,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            valueColor:
-                                AlwaysStoppedAnimation<Color>(Colors.white),
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.white,
+                            ),
                           ),
                         )
                       : const Text('Parkı Sil'),
@@ -247,15 +228,11 @@ class _ParkingPageState extends State<ParkingPage> {
               ],
             ),
             const SizedBox(height: 16),
-            if (_error != null)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: Text(
-                  _error!,
-                  style: const TextStyle(color: Colors.red),
-                ),
-              ),
-            _buildLatestCard(),
+            Expanded(
+              child: _loadingLatest
+                  ? const Center(child: CircularProgressIndicator())
+                  : _buildLatestCard(),
+            ),
           ],
         ),
       ),
@@ -263,12 +240,8 @@ class _ParkingPageState extends State<ParkingPage> {
   }
 
   Widget _buildLatestCard() {
-    if (_loadingLatest) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
     if (_latestParking == null) {
-      return const Text('Kayıtlı park bilgisi yok');
+      return const Center(child: Text('Kayıtlı park bilgisi yok'));
     }
 
     final lat = _latestParking?['lat']?.toString() ?? '-';

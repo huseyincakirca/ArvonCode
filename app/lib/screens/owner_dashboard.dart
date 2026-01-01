@@ -267,22 +267,10 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                             alignment: Alignment.centerRight,
                             child: GestureDetector(
                               onTap: () {
-                                if (widget.ownerToken == null ||
-                                    widget.ownerToken!.trim().isEmpty) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                        content: Text('Token bulunamadı')),
-                                  );
-                                  return;
-                                }
-
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => ParkingPage(
-                                      token: widget.ownerToken!.trim(),
-                                    ),
-                                  ),
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: Text(
+                                          'Park ekranı QR/NFC sonrası araç seçilerek açılır.')),
                                 );
                               },
                               child: _blueButton("Parklarım", small: true),
