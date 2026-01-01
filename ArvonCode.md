@@ -29,7 +29,7 @@ aktif referans DEĞİLDİR.
 
 ## 🔵 AKTİF CHECKPOINT DURUMU
 
- Aktif checkpoint: Checkpoint #41 — DEVAM EDİYOR — Push Gönderim Optimizasyonu & Queue (Backend)
+ Aktif checkpoint: Checkpoint #44 — DEVAM EDİYOR — Queue Operasyonel Doğrulama & Monitoring (Backend)
 
 ### CHECKPOINT #39 — Push Stabilizasyonu & UX İyileştirme
 - Durum: TAMAMLANDI
@@ -120,6 +120,15 @@ aktif referans DEĞİLDİR.
 - Queue worker lifecycle tanımlandı (deploy config eklendi); kurulum adımı deploy sürecine bağlandı.
 - Checkpoint #41 commit’i, bu checkpoint’e ait olmayan önceden var olan workspace değişikliklerini de içermektedir; commit izolasyonu bozulmuştur.
 - Queue worker lifecycle artık tanımlı; ancak staging/prod’da süreç yöneticisi (supervisor/systemd) kurulumu deploy adımı olarak ayrıca takip edilmelidir.
+
+### CHECKPOINT #44 — Queue Operasyonel Doğrulama & Monitoring (Backend)
+- Tamamlanan:
+  - Failed job altyapısı doğrulandı (failed_jobs).
+  - Queue operasyon komutları dokümante edildi.
+  - Queue health check prosedürü netleştirildi.
+- Bilinçli teknik borçlar / kısıtlar:
+  - Otomatik alerting yok.
+  - Merkezi metrik/monitoring yok (bilinçli olarak kapsam dışı).
 
 
 ## 🗂 ARŞİV – TARİHSEL TEKNİK NOTLAR
