@@ -57,35 +57,26 @@ class SendPushNotificationJob implements ShouldQueue
             return;
         }
 
-        try {
-            $results = $pushNotificationService->sendToTokens(
-                $tokens,
-                $this->type,
-                $this->vehicleUuid,
-                $this->createdAt,
-                array_merge($jobContext, [
-                    'queue' => $jobContext['queue'] ?? null,
-                    'connection' => $jobContext['connection'] ?? null,
-                    'attempts' => $jobContext['attempts'] ?? null,
-                    'max_tries' => $jobContext['max_tries'] ?? null,
-                    'token_count' => count($tokens),
-                ])
-            );
-        } catch (\Throwable $exception) {
-            Log::error('push_failed', array_merge($jobContext, [
-                'exception_class' => get_class($exception),
-                'exception_message' => $exception->getMessage(),
-            ]));
-
-            throw $exception;
-        }
+        $results = $pushNotificationService->sendToTokens(
+            $tokens,
+            $this->type,
+            $this->vehicleUuid,
+            $this->createdAt,
+            array_merge($jobContext, [
+                'queue' => $jobContext['queue'] ?? null,
+                'connection' => $jobContext['connection'] ?? null,
+                'attempts' => $jobContext['attempts'] ?? null,
+                'max_tries' => $jobContext['max_tries'] ?? null,
+                'token_count' => count($tokens),
+            ])
+        );
 
         $this->handleResults($results, $jobContext, $pushNotificationService);
     }
 
     public function failed(\Throwable $exception): void
     {
-        Log::error('push_failed', array_merge($this->buildJobContext([
+        Log::error('push_dispatch_failed', array_merge($this->buildJobContext([
             'owner_id' => $this->ownerId,
             'vehicle_uuid' => $this->vehicleUuid,
             'vehicle_id' => $this->resolveVehicleId(),
@@ -142,7 +133,7 @@ class SendPushNotificationJob implements ShouldQueue
             ->whereIn('token', $tokens)
             ->delete();
 
-        Log::warning('push_failed', array_merge($context, [
+        Log::warning('push_token_invalidated', array_merge($context, [
             'token_hashes' => $hashed,
             'exception_class' => $context['exception_class'] ?? null,
             'exception_message' => $context['exception_message'] ?? 'invalid_tokens_soft_disabled',

@@ -69,7 +69,7 @@ class LegacyFcmTransport implements PushTransportInterface
         ], $context);
 
         if (empty($serverKey)) {
-            Log::error('push_failed', array_merge($context, [
+            Log::warning('push_config_error', array_merge($context, [
                 'reason' => 'server_key_missing',
                 'exception_message' => 'FCM_SERVER_KEY is not set; skipping push notification.',
             ]));
@@ -90,7 +90,7 @@ class LegacyFcmTransport implements PushTransportInterface
             ]);
 
         if ($response->serverError()) {
-            Log::error('push_failed', array_merge($context, [
+            Log::error('push_retryable_error', array_merge($context, [
                 'http_status' => $response->status(),
                 'exception_message' => 'Legacy FCM server error',
                 'body' => $response->body(),
@@ -102,7 +102,7 @@ class LegacyFcmTransport implements PushTransportInterface
         }
 
         if ($response->clientError()) {
-            Log::error('push_failed', array_merge($context, [
+            Log::warning('push_token_invalidated', array_merge($context, [
                 'http_status' => $response->status(),
                 'fcm_error_code' => $response->json('error'),
                 'exception_message' => 'Legacy FCM client error',
@@ -115,7 +115,7 @@ class LegacyFcmTransport implements PushTransportInterface
         }
 
         if ($response->failed()) {
-            Log::error('push_failed', array_merge($context, [
+            Log::error('push_retryable_error', array_merge($context, [
                 'http_status' => $response->status(),
                 'exception_message' => 'Legacy FCM unexpected failure',
                 'body' => $response->body(),

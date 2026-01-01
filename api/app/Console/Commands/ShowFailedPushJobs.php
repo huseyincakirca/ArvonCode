@@ -73,6 +73,10 @@ class ShowFailedPushJobs extends Command
                 $this->line('Token count: ' . $details['token_count']);
             }
 
+            if (isset($details['command_unserialize_error'])) {
+                $this->line('Command unserialize error: ' . $details['command_unserialize_error']);
+            }
+
             $this->line('Exception: ' . $this->shortenException($job->exception));
             $this->line('Payload excerpt: ' . $this->buildPayloadExcerpt($payload));
         }
@@ -128,7 +132,7 @@ class ShowFailedPushJobs extends Command
         }
 
         try {
-            $job = unserialize($command, ['allowed_classes' => true]);
+            $job = unserialize($command, ['allowed_classes' => [SendPushNotificationJob::class]]);
         } catch (\Throwable $e) {
             return [
                 'command_unserialize_error' => $e->getMessage(),

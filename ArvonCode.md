@@ -149,7 +149,7 @@ aktif referans DEĞİLDİR.
 ### CHECKPOINT #46 — Push Failure Observability (Backend) — 2026-01-01
 - Durum: TAMAMLANDI
 - Tamamlanan:
-  - push_failed / push_sent structured log standardı eklendi
+  - push_sent structured log standardı eklendi (failure semantik ayrımı Checkpoint #47 ile tamamlandı)
   - push_transport_fallback görünür uyarı log’u eklendi
   - Queue::failing hook ile job failure context loglandı (push_job_failed ayrımı dahil)
   - Failed push job inceleme artisan komutu eklendi (failed_jobs payload + exception okunabilir)
@@ -165,6 +165,17 @@ aktif referans DEĞİLDİR.
 - Test sonucu:
   - php artisan test → PASS
   - Artisan komutu çalıştı ve failed push job’ları okunabilir çıktı verdi
+
+### CHECKPOINT #47 — Push Observability Semantics & Noise Reduction — 2026-01-01
+- Durum: TAMAMLANDI
+- Tamamlanan:
+  - Duplicate push failure log’ları kaldırıldı (tek failure kaynağı)
+  - Push log event isimleri semantik olarak ayrıldı
+  - Invalid token olayları ayrı business event olarak loglanıyor
+  - Retryable / config / dispatch hataları ayrıştırıldı
+  - Failed job inceleme komutunda unserialize güvenliği daraltıldı
+- Risk notu:
+  - Failed job inceleme komutu DB bağlantısına bağımlıdır; DB yoksa çalışmaz (bilinçli kısıt)
 
 
 ## 🗂 ARŞİV – TARİHSEL TEKNİK NOTLAR

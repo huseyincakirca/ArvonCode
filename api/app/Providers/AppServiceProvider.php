@@ -23,7 +23,8 @@ class AppServiceProvider extends ServiceProvider
             $transport = config($configKey, 'legacy');
 
             if (!in_array($transport, ['v1', 'legacy'], true)) {
-                Log::warning('push_transport_fallback', [
+                Log::warning('push_config_error', [
+                    'reason' => 'transport_invalid',
                     'transport_config_key' => $configKey,
                     'transport_config_value' => $transport,
                     'transport_resolved' => 'legacy',
@@ -56,12 +57,13 @@ class AppServiceProvider extends ServiceProvider
         Queue::failing(function (JobFailed $event) {
             $payload = $event->job->payload();
             $jobName = $event->job->resolveName();
+            $jobClass = $payload['displayName'] ?? ($payload['data']['commandName'] ?? $jobName);
             $payloadExcerpt = $this->buildPayloadExcerpt($payload);
             $isPushRelated = $this->isPushRelatedJob($jobName, $payloadExcerpt);
 
             $context = [
                 'job_name' => $jobName,
-                'job_class' => $jobName,
+                'job_class' => $jobClass,
                 'queue' => $event->job->getQueue(),
                 'connection' => $event->connectionName,
                 'attempts' => $event->job->attempts(),

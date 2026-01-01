@@ -54,7 +54,7 @@ class FcmV1Transport implements PushTransportInterface
         ], $context);
 
         if (empty($this->projectId)) {
-            Log::error('push_failed', array_merge($baseContext, [
+            Log::warning('push_config_error', array_merge($baseContext, [
                 'reason' => 'project_id_missing',
                 'exception_message' => 'FCM v1 project id is missing',
             ]));
@@ -64,7 +64,7 @@ class FcmV1Transport implements PushTransportInterface
         $accessToken = $this->getAccessToken($baseContext);
 
         if (!$accessToken) {
-            Log::error('push_failed', array_merge($baseContext, [
+            Log::warning('push_config_error', array_merge($baseContext, [
                 'reason' => 'access_token_unavailable',
                 'exception_message' => 'FCM v1 access token unavailable',
             ]));
@@ -125,7 +125,7 @@ class FcmV1Transport implements PushTransportInterface
             ]);
 
         if ($response->serverError()) {
-            Log::error('push_failed', array_merge($context, [
+            Log::error('push_dispatch_failed', array_merge($context, [
                 'reason' => 'fcm_v1_oauth_server_error',
                 'http_status' => $response->status(),
                 'fcm_error_code' => $response->json('error.status'),
@@ -138,7 +138,7 @@ class FcmV1Transport implements PushTransportInterface
         }
 
         if ($response->clientError()) {
-            Log::error('push_failed', array_merge($context, [
+            Log::warning('push_config_error', array_merge($context, [
                 'reason' => 'fcm_v1_oauth_client_error',
                 'http_status' => $response->status(),
                 'fcm_error_code' => $response->json('error.status'),
@@ -150,7 +150,7 @@ class FcmV1Transport implements PushTransportInterface
         }
 
         if ($response->failed()) {
-            Log::error('push_failed', array_merge($context, [
+            Log::error('push_dispatch_failed', array_merge($context, [
                 'reason' => 'fcm_v1_oauth_unexpected_failure',
                 'http_status' => $response->status(),
                 'fcm_error_code' => $response->json('error.status'),
@@ -163,7 +163,7 @@ class FcmV1Transport implements PushTransportInterface
         $accessToken = $response->json('access_token');
 
         if (!$accessToken) {
-            Log::error('push_failed', array_merge($context, [
+            Log::warning('push_config_error', array_merge($context, [
                 'reason' => 'access_token_missing',
             ]));
             return null;
@@ -202,7 +202,7 @@ class FcmV1Transport implements PushTransportInterface
         ], $context);
 
         if (empty($this->projectId)) {
-            Log::error('push_failed', array_merge($context, [
+            Log::warning('push_config_error', array_merge($context, [
                 'reason' => 'project_id_missing',
                 'exception_message' => 'FCM v1 project id is missing',
             ]));
@@ -213,7 +213,7 @@ class FcmV1Transport implements PushTransportInterface
         $tokenToUse = $accessToken ?? $this->getAccessToken($context);
 
         if (!$tokenToUse) {
-            Log::error('push_failed', array_merge($context, [
+            Log::warning('push_config_error', array_merge($context, [
                 'reason' => 'access_token_unavailable',
                 'exception_message' => 'FCM v1 access token unavailable',
             ]));
@@ -233,7 +233,7 @@ class FcmV1Transport implements PushTransportInterface
                 ->timeout(10)
                 ->post($endpoint, $payload);
         } catch (\Throwable $e) {
-            Log::error('push_failed', array_merge($context, [
+            Log::error('push_retryable_error', array_merge($context, [
                 'exception_class' => get_class($e),
                 'exception_message' => $e->getMessage(),
             ]));
@@ -244,14 +244,14 @@ class FcmV1Transport implements PushTransportInterface
         $status = $this->classifyResponse($response);
 
         if ($status === 'retryable') {
-            Log::error('push_failed', array_merge($context, [
+            Log::error('push_retryable_error', array_merge($context, [
                 'http_status' => $response->status(),
                 'fcm_error_code' => $response->json('error.status'),
                 'exception_message' => $response->json('error.message'),
                 'body' => $response->body(),
             ]));
         } elseif ($status === 'invalid') {
-            Log::error('push_failed', array_merge($context, [
+            Log::warning('push_token_invalidated', array_merge($context, [
                 'http_status' => $response->status(),
                 'fcm_error_code' => $response->json('error.status'),
                 'exception_message' => $response->json('error.message'),
@@ -309,7 +309,7 @@ class FcmV1Transport implements PushTransportInterface
     private function loadServiceAccount(array $context): ?array
     {
         if (empty($this->serviceAccountPath)) {
-            Log::error('push_failed', array_merge($context, [
+            Log::warning('push_config_error', array_merge($context, [
                 'reason' => 'service_account_path_missing',
                 'exception_message' => 'FCM v1 service account path missing',
             ]));
@@ -319,7 +319,7 @@ class FcmV1Transport implements PushTransportInterface
         $path = $this->resolvePath($this->serviceAccountPath);
 
         if (!$path || !is_readable($path)) {
-            Log::error('push_failed', array_merge($context, [
+            Log::warning('push_config_error', array_merge($context, [
                 'reason' => 'service_account_unreadable',
                 'exception_message' => 'FCM v1 service account file not readable',
                 'path' => $this->serviceAccountPath,
@@ -331,7 +331,7 @@ class FcmV1Transport implements PushTransportInterface
         $data = json_decode($contents, true);
 
         if (!is_array($data)) {
-            Log::error('push_failed', array_merge($context, [
+            Log::warning('push_config_error', array_merge($context, [
                 'reason' => 'service_account_invalid_json',
                 'exception_message' => 'FCM v1 service account JSON is invalid',
                 'path' => $path,
@@ -348,7 +348,7 @@ class FcmV1Transport implements PushTransportInterface
         $privateKey = $serviceAccount['private_key'] ?? null;
 
         if (!$clientEmail || !$privateKey) {
-            Log::error('push_failed', array_merge($context, [
+            Log::warning('push_config_error', array_merge($context, [
                 'reason' => 'service_account_missing_fields',
                 'exception_message' => 'FCM v1 service account missing client_email or private_key',
             ]));
@@ -380,7 +380,7 @@ class FcmV1Transport implements PushTransportInterface
         $privateKeyResource = openssl_pkey_get_private($privateKey);
 
         if (!$privateKeyResource) {
-            Log::error('push_failed', array_merge($context, [
+            Log::warning('push_config_error', array_merge($context, [
                 'reason' => 'invalid_private_key',
                 'exception_message' => 'FCM v1 private key is invalid or unreadable',
             ]));
@@ -388,7 +388,7 @@ class FcmV1Transport implements PushTransportInterface
         }
 
         if (!openssl_sign($signingInput, $signature, $privateKeyResource, 'SHA256')) {
-            Log::error('push_failed', array_merge($context, [
+            Log::warning('push_config_error', array_merge($context, [
                 'reason' => 'jwt_signing_failed',
                 'exception_message' => 'FCM v1 failed to sign JWT assertion',
             ]));
