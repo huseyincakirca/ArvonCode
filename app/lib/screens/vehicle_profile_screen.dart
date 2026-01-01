@@ -122,14 +122,14 @@ class _VehicleProfileScreenState extends State<VehicleProfileScreen> {
         SnackBar(content: Text('Hata: $e')),
       );
     } finally {
-      if (!mounted) return;
-
       // Spinner hemen gitmesin diye min 400ms tut (gözle görünür)
       await Future.delayed(const Duration(milliseconds: 400));
 
-      setState(() {
-        _sendingMessageIds.remove(quickMessageId);
-      });
+      if (mounted) {
+        setState(() {
+          _sendingMessageIds.remove(quickMessageId);
+        });
+      }
     }
   }
 
@@ -172,7 +172,6 @@ class _VehicleProfileScreenState extends State<VehicleProfileScreen> {
     if (!mounted) return;
     _parkingPrompted = true;
 
-    // ignore: use_build_context_synchronously
     showModalBottomSheet(
       context: context,
       builder: (context) {

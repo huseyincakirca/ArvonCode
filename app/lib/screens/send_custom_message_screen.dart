@@ -75,8 +75,9 @@ class _SendCustomMessageScreenState extends State<SendCustomMessageScreen> {
         SnackBar(content: Text('Hata: $e')),
       );
     } finally {
-      if (!mounted) return;
-      setState(() => _isSending = false);
+      if (mounted) {
+        setState(() => _isSending = false);
+      }
     }
   }
 

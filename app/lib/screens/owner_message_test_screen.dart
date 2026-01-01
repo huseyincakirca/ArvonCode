@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../services/message_service.dart';
 
@@ -17,15 +18,15 @@ class OwnerMessageTestScreen extends StatelessWidget {
               final messages =
                   await MessageService().fetchMessages(token: token);
 
-              print('Messages fetched: ${messages.length}');
+              debugPrint('Messages fetched: ${messages.length}');
 
               if (messages.isNotEmpty) {
                 final first = messages.first;
-                print(
+                debugPrint(
                     'First: #${first.id} | ${first.content} | ${first.vehicleUuid}');
               }
             } catch (e) {
-              print('ERROR: $e');
+              debugPrint('ERROR: $e');
             }
           },
           child: const Text('TEST FETCH MESSAGES'),

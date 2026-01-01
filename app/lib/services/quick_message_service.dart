@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:flutter/foundation.dart';
 import '../config/api_config.dart';
 
 class QuickMessageService {
@@ -25,15 +26,15 @@ class QuickMessageService {
       );
 
       if (response.statusCode == 200) {
-        print("Quick message gönderildi: ${response.body}");
+        debugPrint("Quick message gönderildi: ${response.body}");
         return true;
       } else {
-        print("Hata kodu: ${response.statusCode}");
-        print("Hata: ${response.body}");
+        debugPrint("Hata kodu: ${response.statusCode}");
+        debugPrint("Hata: ${response.body}");
         return false;
       }
     } catch (e) {
-      print("Bağlantı hatası: $e");
+      debugPrint("Bağlantı hatası: $e");
       return false;
     }
   }
