@@ -51,6 +51,46 @@ aktif referans DEĞİLDİR.
   - initState + post-frame callback
   - veya lifecycle ayrıştırması ile side-effect izolasyonu
 
+## 🚀 ÜRÜN KAPANIŞ STRATEJİSİ (FINAL PLAN)
+
+Amaç:
+- Mevcut teknik altyapıyı bozmadan ürünü yayına almak.
+- Yeni feature eklemeyi durdurup UX/UI entegrasyonuna odaklanmak.
+
+### Stratejik Karar — Feature Freeze
+- Yeni backend endpoint EKLENMEYECEK.
+- Yeni ürün senaryosu EKLENMEYECEK.
+- Sadece UI/UX, copy ve polish çalışması yapılacak.
+
+### Kalan Adımlar (Sırayla)
+
+1) Stitch UI Entegrasyonu
+- Kapsam:
+  - Owner Dashboard
+  - Vehicle Profile (Guest)
+  - Owner Messages Inbox
+- Kural:
+  - İş mantığına dokunulmayacak.
+  - Sadece layout, spacing, renk ve typography düzenlenecek.
+
+2) UX Polish
+- Loading / Empty / Error state’ler sadeleştirilecek.
+- Metinler kullanıcı-dostu hale getirilecek.
+- Akış değişikliği yapılmayacak.
+
+3) Prod Smoke Test
+- Gerçek cihaz testleri:
+  - QR okutma
+  - NFC okutma
+  - Push notification
+  - Parking akışı
+- Kritik crash veya bloklayıcı hata olmadan geçmesi gerekir.
+
+4) Yayın
+- Prod build alınır.
+- Store süreçleri başlatılır.
+- Bu aşamadan sonra sadece hotfix kabul edilir.
+
 ### Parking Feature — Ürün Senaryosu (Referans)
 - Owner, karttaki `vehicle_id` ile park konumunu kaydeder; kayıtlar yalnızca owner token ile okunur/silinir.
 - Giriş: QR/NFC → vehicle_uuid bilgisi; backend `vehicles.vehicle_id` eşleşmesi sonrası `parkings.vehicle_id` (numeric FK) yazılır.
