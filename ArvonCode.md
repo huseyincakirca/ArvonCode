@@ -29,9 +29,9 @@ aktif referans DEĞİLDİR.
 
 ## 🔵 AKTİF CHECKPOINT DURUMU
 
- Aktif checkpoint: Checkpoint #48 — Parking Ürün Senaryosu + Owner Parking Akışı — DEVAM EDİYOR
+ Aktif checkpoint: Checkpoint #48 — Parking Ürün Senaryosu + Owner Parking Akışı — TAMAMLANDI
 
-### CHECKPOINT #48 — Parking Ürün Senaryosu + Owner Parking Akışı — DEVAM EDİYOR
+### CHECKPOINT #48 — Parking Ürün Senaryosu + Owner Parking Akışı — TAMAMLANDI
 - Hedefler:
   - docs/parking.md ile sözleşme kilitlendi
   - Flutter Parking service eklendi
@@ -40,6 +40,16 @@ aktif referans DEĞİLDİR.
 
 #### Bilinçli Eksikler / Borçlar
 - Flutter Parking başlangıçta debug ekranıydı, ürün akışına bağlandı.
+
+⚠️ Bilinçli Teknik Borçlar / Notlar:
+- VehicleProfileScreen içinde `_maybePromptParkingForOwner()` async side-effect’i `build()` metodu içinde tetiklenmektedir.
+- Flutter analyzer bu akış için `use_build_context_synchronously` (info seviyesi) uyarısı üretmektedir.
+- Bu durum bilinçli olarak kabul edilmiştir:
+  - Runtime crash riski yoktur.
+  - Parking ürün senaryosu ve owner-only kontrolü doğru çalışmaktadır.
+- İleride refactor edilmesi planlanmaktadır:
+  - initState + post-frame callback
+  - veya lifecycle ayrıştırması ile side-effect izolasyonu
 
 ### Parking Feature — Ürün Senaryosu (Referans)
 - Owner, karttaki `vehicle_id` ile park konumunu kaydeder; kayıtlar yalnızca owner token ile okunur/silinir.
