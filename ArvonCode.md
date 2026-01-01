@@ -83,6 +83,12 @@ aktif referans DEĞİLDİR.
 - Transport seçimi config (.env) üzerinden yapılabilir hale getirildi.
 - JWT üretimi ve access token cache altyapısı eklendi.
 - Legacy fallback bilinçli olarak korundu.
+### Bilinçli Teknik Borçlar / Riskler (Checkpoint #42)
+- PushNotificationService, payload içinde `created_at` zaman bilgisini taşımaya devam etmektedir; queue retry ve gecikmelerde zaman semantiği sapabilir.
+- FCM HTTP v1 transport’ta tüm 4xx hatalar tek sınıf olarak ele alınmaktadır; farklı 4xx türleri (400 / 401 / 403 / 404) ayrıştırılmamaktadır.
+- FCM HTTP v1 access token cache anahtarı yalnızca service account path’e bağlıdır; çoklu project / multi-account senaryoları için yetersizdir.
+- HTTP v1 ve legacy push gönderimleri için metrik/istatistik (başarı, hata, retry sayısı) toplanmamaktadır.
+- PUSH_TRANSPORT config değeri hatalı girilirse sistem sessizce legacy transport’a düşmektedir; yanlış konfigürasyon açık hata üretmez.
 ### Bilinçli Teknik Borçlar / Riskler
 - HTTP v1 geçişi tamamlandı ancak legacy henüz kaldırılmadı.
 - Service account IAM / quota hataları prod’da sessiz push kaybı riski taşır.
