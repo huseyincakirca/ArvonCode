@@ -23,83 +23,73 @@ class FcmV1Transport implements PushTransportInterface
 
     public function send(string $token, array $notification, array $data): void
     {
+        $result = $this->sendToken($token, $notification, $data);
+
+        if ($result['status'] === 'retryable') {
+            throw new RuntimeException('FCM v1 retryable error for token: ' . $token);
+        }
+    }
+
+    public function sendMulticast(array $tokens, array $notification, array $data): array
+    {
+        $results = [
+            'success' => [],
+            'invalid' => [],
+            'retryable' => [],
+        ];
+
+        if (empty($tokens)) {
+            return $results;
+        }
+
         $context = [
-            'token' => $token,
             'type' => $data['type'] ?? null,
             'vehicle_uuid' => $data['vehicle_uuid'] ?? null,
             'transport' => 'fcm_http_v1',
         ];
 
         if (empty($this->projectId)) {
-            Log::warning('FCM v1 project id is missing; push skipped.', $context);
-            return;
+            Log::warning('FCM v1 project id is missing; multicast skipped.', array_merge($context, [
+                'batch_size' => count($tokens),
+            ]));
+            return $results;
         }
 
-        $endpoint = sprintf(self::FCM_ENDPOINT_TEMPLATE, $this->projectId);
         $accessToken = $this->getAccessToken($context);
 
         if (!$accessToken) {
-            Log::warning('FCM v1 access token unavailable; push skipped.', $context);
-            return;
-        }
-
-        $payload = [
-            'message' => [
-                'token' => $token,
-                'notification' => $notification,
-                'data' => $data,
-            ],
-        ];
-
-        Log::info('FCM v1 push request prepared', array_merge($context, [
-            'endpoint' => $endpoint,
-        ]));
-
-        try {
-            $response = Http::withToken($accessToken)
-                ->timeout(10)
-                ->post($endpoint, $payload);
-        } catch (\Throwable $e) {
-            Log::error('FCM v1 push request failed due to transport error', array_merge($context, [
-                'error' => $e->getMessage(),
+            Log::warning('FCM v1 access token unavailable; multicast skipped.', array_merge($context, [
+                'batch_size' => count($tokens),
             ]));
-            throw new RuntimeException('FCM v1 transport error', 0, $e);
+            return $results;
         }
 
-        if ($response->serverError()) {
-            Log::error('FCM v1 push failed with server error', array_merge($context, [
-                'status' => $response->status(),
-                'body' => $response->body(),
+        $chunks = array_chunk($tokens, 500);
+
+        foreach ($chunks as $index => $chunk) {
+            $chunkResults = $this->sendChunk($chunk, $notification, $data, $accessToken);
+
+            foreach (['success', 'invalid', 'retryable'] as $key) {
+                $results[$key] = array_merge($results[$key], $chunkResults[$key]);
+            }
+
+            Log::info('FCM v1 multicast batch processed', array_merge($context, [
+                'batch_index' => $index,
+                'batch_size' => count($chunk),
+                'success_count' => count($chunkResults['success']),
+                'invalid_count' => count($chunkResults['invalid']),
+                'retry_count' => count($chunkResults['retryable']),
             ]));
-
-            throw new RuntimeException('FCM v1 server error: ' . $response->status());
         }
 
-        if ($response->clientError()) {
-            Log::warning('FCM v1 push skipped due to client error', array_merge($context, [
-                'status' => $response->status(),
-                'body' => $response->body(),
-            ]));
-            return;
-        }
-
-        if ($response->failed()) {
-            Log::error('FCM v1 push failed with unexpected error', array_merge($context, [
-                'status' => $response->status(),
-                'body' => $response->body(),
-            ]));
-
-            $response->throw();
-        }
-
-        Log::info('FCM v1 push sent', $context);
+        return $results;
     }
 
     private function getAccessToken(array $context): ?string
     {
         $cacheKey = sprintf(
             'fcm_v1_access_token_%s',
-            md5((string) $this->serviceAccountPath)
+            md5((string) $this->serviceAccountPath . '|' . (string) $this->projectId)
         );
 
         if ($cached = Cache::get($cacheKey)) {
@@ -162,6 +152,123 @@ class FcmV1Transport implements PushTransportInterface
         Cache::put($cacheKey, $accessToken, now()->addMinutes(50));
 
         return $accessToken;
+    }
+
+    private function sendChunk(array $tokens, array $notification, array $data, string $accessToken): array
+    {
+        $results = [
+            'success' => [],
+            'invalid' => [],
+            'retryable' => [],
+        ];
+
+        foreach ($tokens as $token) {
+            $result = $this->sendToken($token, $notification, $data, $accessToken);
+            $results[$result['status']][] = $token;
+        }
+
+        return $results;
+    }
+
+    private function sendToken(string $token, array $notification, array $data, ?string $accessToken = null): array
+    {
+        $context = [
+            'token' => $token,
+            'type' => $data['type'] ?? null,
+            'vehicle_uuid' => $data['vehicle_uuid'] ?? null,
+            'transport' => 'fcm_http_v1',
+        ];
+
+        if (empty($this->projectId)) {
+            Log::warning('FCM v1 project id is missing; push skipped.', $context);
+            return ['status' => 'invalid'];
+        }
+
+        $endpoint = sprintf(self::FCM_ENDPOINT_TEMPLATE, $this->projectId);
+        $tokenToUse = $accessToken ?? $this->getAccessToken($context);
+
+        if (!$tokenToUse) {
+            Log::warning('FCM v1 access token unavailable; push skipped.', $context);
+            return ['status' => 'invalid'];
+        }
+
+        $payload = [
+            'message' => [
+                'token' => $token,
+                'notification' => $notification,
+                'data' => $data,
+            ],
+        ];
+
+        try {
+            $response = Http::withToken($tokenToUse)
+                ->timeout(10)
+                ->post($endpoint, $payload);
+        } catch (\Throwable $e) {
+            Log::error('FCM v1 push request failed due to transport error', array_merge($context, [
+                'error' => $e->getMessage(),
+            ]));
+
+            return ['status' => 'retryable'];
+        }
+
+        $status = $this->classifyResponse($response);
+
+        if ($status === 'retryable') {
+            Log::error('FCM v1 push failed with retryable error', array_merge($context, [
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]));
+        } elseif ($status === 'invalid') {
+            Log::warning('FCM v1 push marked token invalid', array_merge($context, [
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]));
+        } else {
+            Log::info('FCM v1 push sent', $context);
+        }
+
+        return ['status' => $status];
+    }
+
+    private function classifyResponse($response): string
+    {
+        if ($response->successful()) {
+            return 'success';
+        }
+
+        if ($response->serverError()) {
+            return 'retryable';
+        }
+
+        if ($response->clientError()) {
+            $errorStatus = $response->json('error.status');
+            $errorMessage = $response->json('error.message');
+            $invalidCodes = ['UNREGISTERED', 'NOT_REGISTERED', 'INVALID_ARGUMENT'];
+
+            if ($errorStatus && in_array($errorStatus, $invalidCodes, true)) {
+                return 'invalid';
+            }
+
+            if ($errorMessage && $this->messageIndicatesInvalid($errorMessage, $invalidCodes)) {
+                return 'invalid';
+            }
+
+            return 'invalid';
+        }
+
+        return $response->failed() ? 'retryable' : 'invalid';
+    }
+
+    private function messageIndicatesInvalid(string $message, array $invalidCodes): bool
+    {
+        foreach ($invalidCodes as $code) {
+            if (str_contains($message, $code)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private function loadServiceAccount(array $context): ?array

@@ -12,6 +12,40 @@ class LegacyFcmTransport implements PushTransportInterface
 
     public function send(string $token, array $notification, array $data): void
     {
+        $result = $this->sendAndClassify($token, $notification, $data);
+
+        if ($result['status'] === 'retryable') {
+            throw new RuntimeException('Legacy FCM retryable error for token: ' . $token);
+        }
+    }
+
+    public function sendMulticast(array $tokens, array $notification, array $data): array
+    {
+        $results = [
+            'success' => [],
+            'invalid' => [],
+            'retryable' => [],
+        ];
+
+        foreach ($tokens as $token) {
+            $result = $this->sendAndClassify($token, $notification, $data);
+
+            $results[$result['status']][] = $token;
+        }
+
+        Log::info('Legacy FCM multicast batch processed', [
+            'transport' => 'legacy',
+            'batch_size' => count($tokens),
+            'success_count' => count($results['success']),
+            'invalid_count' => count($results['invalid']),
+            'retry_count' => count($results['retryable']),
+        ]);
+
+        return $results;
+    }
+
+    private function sendAndClassify(string $token, array $notification, array $data): array
+    {
         $serverKey = config('services.fcm.server_key');
         $context = [
             'token' => $token,
@@ -23,7 +57,9 @@ class LegacyFcmTransport implements PushTransportInterface
             Log::warning('FCM_SERVER_KEY is not set; skipping push notification.', [
                 ...$context,
             ]);
-            return;
+            return [
+                'status' => 'invalid',
+            ];
         }
 
         $response = Http::withHeaders([
@@ -43,7 +79,9 @@ class LegacyFcmTransport implements PushTransportInterface
                 'body' => $response->body(),
             ]));
 
-            throw new RuntimeException('FCM server error: ' . $response->status());
+            return [
+                'status' => 'retryable',
+            ];
         }
 
         if ($response->clientError()) {
@@ -52,7 +90,9 @@ class LegacyFcmTransport implements PushTransportInterface
                 'body' => $response->body(),
             ]));
 
-            return;
+            return [
+                'status' => 'invalid',
+            ];
         }
 
         if ($response->failed()) {
@@ -61,11 +101,17 @@ class LegacyFcmTransport implements PushTransportInterface
                 'body' => $response->body(),
             ]));
 
-            $response->throw();
+            return [
+                'status' => 'retryable',
+            ];
         }
 
         Log::info('FCM push sent', array_merge($context, [
             'note' => 'Using FCM legacy HTTP API',
         ]));
+
+        return [
+            'status' => 'success',
+        ];
     }
 }

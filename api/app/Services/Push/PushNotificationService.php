@@ -8,17 +8,15 @@ class PushNotificationService
     {
     }
 
-    public function sendToTokens(array $tokens, string $type, string $vehicleUuid, string $createdAt): void
+    public function sendToTokens(array $tokens, string $type, string $vehicleUuid, string $createdAt): array
     {
         $payload = $this->buildPayload($type, $vehicleUuid, $createdAt);
 
-        foreach ($tokens as $token) {
-            $this->transport->send(
-                $token,
-                $payload['notification'],
-                $payload['data']
-            );
-        }
+        return $this->transport->sendMulticast(
+            $tokens,
+            $payload['notification'],
+            $payload['data']
+        );
     }
 
     public function buildPayload(string $type, string $vehicleUuid, string $createdAt): array
