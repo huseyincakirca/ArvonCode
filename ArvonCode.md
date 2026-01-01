@@ -77,6 +77,12 @@ aktif referans DEĞİLDİR.
   - Retry & backoff mekanizması eklendi.
   - Backend flood koruması uygulandı.
   - PushService legacy FCM’den ayrıştırıldı.
+### Bilinçli Teknik Borçlar / Riskler (Checkpoint #41)
+- Push job constructor içinde `createdAt` gibi zaman verisi taşınmaktadır; job execution gecikmelerinde zaman semantiği sapabilir.
+- Flood koruması için kullanılan cache lock key, `vehicle_id` bulunamadığında `vehicle_uuid` fallback’i kullanmaktadır; tek tip anahtar semantiği yoktur.
+- Push token varlığı Listener seviyesinde, token listesi ise Job içinde tekrar sorgulanmaktadır; veri erişimi duplike durumdadır.
+- Queue worker lifecycle (supervisor / process yönetimi) bu checkpoint kapsamında tanımlanmamıştır.
+- Checkpoint #41 commit’i, bu checkpoint’e ait olmayan önceden var olan workspace değişikliklerini de içermektedir; commit izolasyonu bozulmuştur.
 
 
 ## 🗂 ARŞİV – TARİHSEL TEKNİK NOTLAR
