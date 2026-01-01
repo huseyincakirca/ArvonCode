@@ -1,4 +1,5 @@
 # Yol Haritası
+> Aktif checkpoint ve ilerleme durumu ArvonCode.md’den takip edilir.
 
 ## Tamamlanan
 - Auth

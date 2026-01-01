@@ -77,6 +77,9 @@ aktif referans DEĞİLDİR.
   - Retry & backoff mekanizması eklendi.
   - Backend flood koruması uygulandı.
   - PushService legacy FCM’den ayrıştırıldı.
+  - Queue worker lifecycle tanımı eklendi (supervisor/systemd/docker config).
+  - Queue worker çalıştırma dokümantasyonu /docs/environments.md içine eklendi.
+  - Backend smoke: php artisan test + route:list çalıştırıldı.
 ### CHECKPOINT #42 — FCM HTTP v1 Geçiş Hazırlığı
 - Service Account tabanlı HTTP v1 transport eklendi.
 - Legacy ve HTTP v1 transport’lar paralel çalışabilir hale getirildi.
@@ -104,7 +107,7 @@ aktif referans DEĞİLDİR.
   - Legacy transport’ta invalid token ayrımı sınırlı; client error’lar invalid olarak işaretlenir.
   - Access token üretimi hâlâ service account path + project_id cache anahtarına bağlı; multi-tenant için genişletme gerekir.
   - Multicast metrikleri log tabanlı; kalıcı metrik/alerting yok.
-  - Subset retry yeni job oluşturur; toplam deneme sayısı transport seviyesinde izlenmez.
+- Subset retry yeni job oluşturur; toplam deneme sayısı transport seviyesinde izlenmez.
 ### Bilinçli Teknik Borçlar / Riskler
 - HTTP v1 geçişi tamamlandı ancak legacy henüz kaldırılmadı.
 - Service account IAM / quota hataları prod’da sessiz push kaybı riski taşır.
@@ -114,8 +117,9 @@ aktif referans DEĞİLDİR.
 - Push job constructor içinde `createdAt` gibi zaman verisi taşınmaktadır; job execution gecikmelerinde zaman semantiği sapabilir.
 - Flood koruması için kullanılan cache lock key, `vehicle_id` bulunamadığında `vehicle_uuid` fallback’i kullanmaktadır; tek tip anahtar semantiği yoktur.
 - Push token varlığı Listener seviyesinde, token listesi ise Job içinde tekrar sorgulanmaktadır; veri erişimi duplike durumdadır.
-- Queue worker lifecycle (supervisor / process yönetimi) bu checkpoint kapsamında tanımlanmamıştır.
+- Queue worker lifecycle tanımlandı (deploy config eklendi); kurulum adımı deploy sürecine bağlandı.
 - Checkpoint #41 commit’i, bu checkpoint’e ait olmayan önceden var olan workspace değişikliklerini de içermektedir; commit izolasyonu bozulmuştur.
+- Queue worker lifecycle artık tanımlı; ancak staging/prod’da süreç yöneticisi (supervisor/systemd) kurulumu deploy adımı olarak ayrıca takip edilmelidir.
 
 
 ## 🗂 ARŞİV – TARİHSEL TEKNİK NOTLAR
