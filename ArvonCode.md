@@ -57,6 +57,36 @@ Amaç:
 - Mevcut teknik altyapıyı bozmadan ürünü yayına almak.
 - Yeni feature eklemeyi durdurup UX/UI entegrasyonuna odaklanmak.
 
+### Push Notification (FCM) — Final Doğrulama
+
+Karar:
+- Push altyapısı Firebase Cloud Messaging (FCM) üzerinden çalışmaktadır.
+- OneSignal kullanılmamaktadır ve bu aşamada değerlendirilmeyecektir.
+
+Test Stratejisi (Gerçek Cihaz):
+1) Firebase Console doğrulaması:
+   - Cloud Messaging aktif
+   - Uygulama doğru Firebase projesine bağlı
+
+2) Cihaz token doğrulaması:
+   - Gerçek cihazdan login sonrası
+   - `user_push_tokens` tablosunda token kaydı kontrol edilir
+
+3) Uçtan uca push testi:
+   - Guest akışından (QR/NFC):
+     - Quick Message veya
+     - Location gönderilir
+   - Owner cihazında push alınır
+
+4) App state testleri:
+   - Foreground
+   - Background
+   - Killed state
+
+Başarı Kriteri:
+- Push bildirimi tüm state’lerde alınabiliyorsa,
+  push altyapısı prod için kabul edilir.
+
 ### Stratejik Karar — Feature Freeze
 - Yeni backend endpoint EKLENMEYECEK.
 - Yeni ürün senaryosu EKLENMEYECEK.
