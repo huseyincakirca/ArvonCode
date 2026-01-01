@@ -29,7 +29,7 @@ aktif referans DEĞİLDİR.
 
 ## 🔵 AKTİF CHECKPOINT DURUMU
 
- Aktif checkpoint: Checkpoint #44 — DEVAM EDİYOR — Queue Operasyonel Doğrulama & Monitoring (Backend)
+ Aktif checkpoint: Checkpoint #45 — Push Failure Senaryoları & Gözlemlenebilirlik (Backend) — DEVAM EDİYOR
 
 ### CHECKPOINT #39 — Push Stabilizasyonu & UX İyileştirme
 - Durum: TAMAMLANDI
@@ -71,7 +71,7 @@ aktif referans DEĞİLDİR.
   - Push UX senaryoları Android gerçek cihazda manuel test edilecek; otomatik test yok
 
 ### CHECKPOINT #41 — Push Gönderim Optimizasyonu & Queue
-- Durum: DEVAM EDİYOR
+- Durum: TAMAMLANDI
 - Tamamlanan:
   - Push gönderimi queue tabanlı hale getirildi.
   - Retry & backoff mekanizması eklendi.
@@ -122,6 +122,7 @@ aktif referans DEĞİLDİR.
 - Queue worker lifecycle artık tanımlı; ancak staging/prod’da süreç yöneticisi (supervisor/systemd) kurulumu deploy adımı olarak ayrıca takip edilmelidir.
 
 ### CHECKPOINT #44 — Queue Operasyonel Doğrulama & Monitoring (Backend)
+- Durum: TAMAMLANDI
 - Tamamlanan:
   - Failed job altyapısı doğrulandı (failed_jobs).
   - Queue operasyon komutları dokümante edildi.
@@ -129,6 +130,21 @@ aktif referans DEĞİLDİR.
 - Bilinçli teknik borçlar / kısıtlar:
   - Otomatik alerting yok.
   - Merkezi metrik/monitoring yok (bilinçli olarak kapsam dışı).
+
+### CHECKPOINT #45 — Push Failure Senaryoları & Gözlemlenebilirlik (Backend)
+- Amaç:
+  - Push işlemi başarısız olduğunda yalnızca “fail oldu” değil, **“neden fail oldu?”** sorusuna cevap verebilmek.
+- Kapsam:
+  - Failed job payload ve exception içeriğinin analiz edilebilir hale getirilmesi
+  - Retry davranışlarının görünür kılınması
+  - Log tabanlı kök neden (root cause) analizi zemini
+- Kapsam dışı:
+  - Prometheus / Grafana
+  - Otomatik alerting
+  - Harici monitoring servisleri
+- Bilinçli teknik borçlar:
+  - Job-level failure’lar merkezi metriklere dönüşmemektedir.
+  - Fail nedenleri manuel analiz gerektirir.
 
 
 ## 🗂 ARŞİV – TARİHSEL TEKNİK NOTLAR
