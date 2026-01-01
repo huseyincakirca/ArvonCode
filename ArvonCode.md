@@ -29,7 +29,14 @@ aktif referans DEĞİLDİR.
 
 ## 🔵 AKTİF CHECKPOINT DURUMU
 
- Aktif checkpoint: Checkpoint #45 — Push Failure Senaryoları & Gözlemlenebilirlik (Backend) — DEVAM EDİYOR
+ Aktif checkpoint: Checkpoint #48 — Parking Sözleşmesi + Flutter Owner Parking MVP — DEVAM EDİYOR
+
+### CHECKPOINT #48 — Parking Sözleşmesi + Flutter Owner Parking MVP — DEVAM EDİYOR
+- Hedefler:
+  - docs/parking.md ile sözleşme kilitlendi
+  - Flutter Parking service eklendi
+  - Owner ParkingPage eklendi ve dashboard navigation bağlandı
+  - Test komutları çalıştırıldı (route:list, php artisan test, flutter analyze)
 
 ### CHECKPOINT #39 — Push Stabilizasyonu & UX İyileştirme
 - Durum: TAMAMLANDI

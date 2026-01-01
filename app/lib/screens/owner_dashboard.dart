@@ -5,6 +5,7 @@ import '../services/message_service.dart';
 import '../utils/date_formatter.dart';
 import 'owner/messages_page.dart';
 import 'owner/locations_page.dart';
+import 'owner/parking_page.dart';
 import 'settings_screen.dart';
 
 class OwnerDashboard extends StatefulWidget {
@@ -257,6 +258,34 @@ class _OwnerDashboardState extends State<OwnerDashboard> {
                                 );
                               },
                               child: _blueButton("Konumlarım", small: true),
+                            ),
+                          ),
+
+                          const SizedBox(height: 12),
+
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: GestureDetector(
+                              onTap: () {
+                                if (widget.ownerToken == null ||
+                                    widget.ownerToken!.trim().isEmpty) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                        content: Text('Token bulunamadı')),
+                                  );
+                                  return;
+                                }
+
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ParkingPage(
+                                      token: widget.ownerToken!.trim(),
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: _blueButton("Parklarım", small: true),
                             ),
                           ),
 

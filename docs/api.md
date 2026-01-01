@@ -20,6 +20,7 @@ GET    /api/vehicle/{vehicle_id}
 POST   /api/parking/set
 GET    /api/parking/latest/{vehicle_id}
 DELETE /api/parking/delete/{vehicle_id}
+- Detaylı sözleşme: `docs/parking.md`
 
 ### Messages (Owner)
 GET    /api/messages
