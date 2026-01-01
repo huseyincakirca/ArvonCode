@@ -91,12 +91,12 @@ aktif referans DEĞİLDİR.
 - PUSH_TRANSPORT config değeri hatalı girilirse sistem sessizce legacy transport’a düşmektedir; yanlış konfigürasyon açık hata üretmez.
 ### CHECKPOINT #43 — Push Batch / Multicast & Token Invalidation
 - Kapsam:
-  - HTTP v1 push için batch/multicast gönderim ve token bazlı sonuç takibi
+  - HTTP v1 push için token bazlı sonuç takibi + 500’lük chunk ile tekil HTTP v1 messages:send çağrıları (batch endpoint yok)
   - Invalid token’ların otomatik pasiflenmesi (soft disable + soft delete)
   - Retry-worthy token’lar için subset retry dispatch (batch tamamı retry edilmez)
 - Kararlar:
   - PushTransportInterface’e sendMulticast eklendi; PushNotificationService tüm token listesi için multicast kullanıyor.
-  - FCM HTTP v1 transport’ta 500’lük chunk’lar ile gönderim ve token bazlı success/invalid/retryable ayrımı yapılıyor.
+  - FCM HTTP v1 transport’ta 500’lük chunk’lar ile tekil messages:send çağrıları ve token bazlı success/invalid/retryable ayrımı yapılıyor.
   - Legacy transport tekil gönderimle korunuyor; multicast çağrıları tekil send üzerinden normalize ediliyor.
   - Retryable token’lar için yeni job dispatch edilir; invalid token’lar is_active=false + soft delete ile pasiflenir.
   - Her batch’te success/invalid/retry_count loglanır; sessiz invalidation yok.
