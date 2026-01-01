@@ -10,16 +10,16 @@ class LegacyFcmTransport implements PushTransportInterface
 {
     private const FCM_ENDPOINT = 'https://fcm.googleapis.com/fcm/send';
 
-    public function send(string $token, array $notification, array $data): void
+    public function send(string $token, array $notification, array $data, array $context = []): void
     {
-        $result = $this->sendAndClassify($token, $notification, $data);
+        $result = $this->sendAndClassify($token, $notification, $data, $context);
 
         if ($result['status'] === 'retryable') {
             throw new RuntimeException('Legacy FCM retryable error for token: ' . $token);
         }
     }
 
-    public function sendMulticast(array $tokens, array $notification, array $data): array
+    public function sendMulticast(array $tokens, array $notification, array $data, array $context = []): array
     {
         $results = [
             'success' => [],
@@ -27,36 +27,52 @@ class LegacyFcmTransport implements PushTransportInterface
             'retryable' => [],
         ];
 
+        $baseContext = array_merge([
+            'type' => $data['type'] ?? null,
+            'vehicle_uuid' => $data['vehicle_uuid'] ?? null,
+            'transport' => 'legacy',
+            'transport_config_key' => 'services.fcm.transport',
+            'transport_config_value' => config('services.fcm.transport'),
+            'token_count' => count($tokens),
+            'exception_class' => null,
+            'exception_message' => null,
+        ], $context);
+
         foreach ($tokens as $token) {
-            $result = $this->sendAndClassify($token, $notification, $data);
+            $result = $this->sendAndClassify($token, $notification, $data, array_merge($baseContext, [
+                'token' => $token,
+                'token_count' => 1,
+            ]));
 
             $results[$result['status']][] = $token;
         }
 
-        Log::info('Legacy FCM multicast batch processed', [
-            'transport' => 'legacy',
-            'batch_size' => count($tokens),
+        Log::info('push_sent', array_merge($baseContext, [
             'success_count' => count($results['success']),
             'invalid_count' => count($results['invalid']),
-            'retry_count' => count($results['retryable']),
-        ]);
+            'retryable_count' => count($results['retryable']),
+        ]));
 
         return $results;
     }
 
-    private function sendAndClassify(string $token, array $notification, array $data): array
+    private function sendAndClassify(string $token, array $notification, array $data, array $context = []): array
     {
         $serverKey = config('services.fcm.server_key');
-        $context = [
+        $context = array_merge([
             'token' => $token,
             'type' => $data['type'] ?? null,
             'vehicle_uuid' => $data['vehicle_uuid'] ?? null,
-        ];
+            'transport' => 'legacy',
+            'transport_config_key' => 'services.fcm.transport',
+            'transport_config_value' => config('services.fcm.transport'),
+        ], $context);
 
         if (empty($serverKey)) {
-            Log::warning('FCM_SERVER_KEY is not set; skipping push notification.', [
-                ...$context,
-            ]);
+            Log::error('push_failed', array_merge($context, [
+                'reason' => 'server_key_missing',
+                'exception_message' => 'FCM_SERVER_KEY is not set; skipping push notification.',
+            ]));
             return [
                 'status' => 'invalid',
             ];
@@ -74,8 +90,9 @@ class LegacyFcmTransport implements PushTransportInterface
             ]);
 
         if ($response->serverError()) {
-            Log::error('FCM push send failed with server error', array_merge($context, [
-                'status' => $response->status(),
+            Log::error('push_failed', array_merge($context, [
+                'http_status' => $response->status(),
+                'exception_message' => 'Legacy FCM server error',
                 'body' => $response->body(),
             ]));
 
@@ -85,8 +102,10 @@ class LegacyFcmTransport implements PushTransportInterface
         }
 
         if ($response->clientError()) {
-            Log::warning('FCM push skipped due to client error', array_merge($context, [
-                'status' => $response->status(),
+            Log::error('push_failed', array_merge($context, [
+                'http_status' => $response->status(),
+                'fcm_error_code' => $response->json('error'),
+                'exception_message' => 'Legacy FCM client error',
                 'body' => $response->body(),
             ]));
 
@@ -96,8 +115,9 @@ class LegacyFcmTransport implements PushTransportInterface
         }
 
         if ($response->failed()) {
-            Log::error('FCM push send failed with unexpected error', array_merge($context, [
-                'status' => $response->status(),
+            Log::error('push_failed', array_merge($context, [
+                'http_status' => $response->status(),
+                'exception_message' => 'Legacy FCM unexpected failure',
                 'body' => $response->body(),
             ]));
 
@@ -106,8 +126,8 @@ class LegacyFcmTransport implements PushTransportInterface
             ];
         }
 
-        Log::info('FCM push sent', array_merge($context, [
-            'note' => 'Using FCM legacy HTTP API',
+        Log::info('push_sent', array_merge($context, [
+            'http_status' => $response->status(),
         ]));
 
         return [

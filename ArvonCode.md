@@ -146,6 +146,26 @@ aktif referans DEĞİLDİR.
   - Job-level failure’lar merkezi metriklere dönüşmemektedir.
   - Fail nedenleri manuel analiz gerektirir.
 
+### CHECKPOINT #46 — Push Failure Observability (Backend) — 2026-01-01
+- Durum: TAMAMLANDI
+- Tamamlanan:
+  - push_failed / push_sent structured log standardı eklendi
+  - push_transport_fallback görünür uyarı log’u eklendi
+  - Queue::failing hook ile job failure context loglandı (push_job_failed ayrımı dahil)
+  - Failed push job inceleme artisan komutu eklendi (failed_jobs payload + exception okunabilir)
+- Etkilenen dosyalar (Backend):
+  - api/app/Providers/AppServiceProvider.php
+  - api/app/Console/Commands/ShowFailedPushJobs.php
+  - api/app/Console/Kernel.php
+  - api/app/Jobs/SendPushNotificationJob.php
+  - api/app/Services/Push/PushNotificationService.php
+  - api/app/Services/Push/PushTransportInterface.php
+  - api/app/Services/Push/FcmV1Transport.php
+  - api/app/Services/Push/LegacyFcmTransport.php
+- Test sonucu:
+  - php artisan test → PASS
+  - Artisan komutu çalıştı ve failed push job’ları okunabilir çıktı verdi
+
 
 ## 🗂 ARŞİV – TARİHSEL TEKNİK NOTLAR
 
@@ -427,6 +447,7 @@ veya
 ### 9.2 NFC İçeriği
 NDEF URI record:
 - `arvoncode://v/<vehicle_uuid>`
+- Tutarsızlık/Risk: NFC akışı: NDEF URI içinden vehicle_uuid parse edilir (UID tabanlı akış doküman hatasıdır).
 
 ---
 ---
