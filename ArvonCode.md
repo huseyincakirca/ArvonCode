@@ -29,7 +29,54 @@ aktif referans DEĞİLDİR.
 
 ## 🔵 AKTİF CHECKPOINT DURUMU
 
-Aktif checkpoint: Checkpoint #39 — DEVAM EDİYOR — Push Stabilizasyonu & UX İyileştirme
+ Aktif checkpoint: Checkpoint #41 — DEVAM EDİYOR — Push Gönderim Optimizasyonu & Queue (Backend)
+
+### CHECKPOINT #39 — Push Stabilizasyonu & UX İyileştirme
+- Durum: TAMAMLANDI
+- Tamamlanan:
+  - Push token refresh (onTokenRefresh) yönetimi
+  - Logout sonrası push token revoke
+  - Token sync retry guard (lifecycle bazlı)
+  - Foreground push davranışı kontrol altına alındı (auto-navigation kapalı)
+  - Push navigation dedup persisted hale getirildi
+  - Push kaynaklı navigation crash riskleri giderildi
+- Test:
+  - Android gerçek cihazda:
+    - token refresh
+    - logout → login
+    - foreground / background / killed push
+    senaryoları manuel test edildi
+
+### CHECKPOINT #40 — Push UX & Notification Tasarımı
+- Durum: TAMAMLANDI
+- Kararlar:
+  - Push type sözleşmesi sabitlendi (message | location)
+  - Foreground push’ta auto-navigation kapatıldı
+  - Foreground push için in-app banner UX uygulandı
+  - Background/killed durumda sistem notification kullanıldı
+  - Push navigation dedup davranışı korundu
+  - Android için tek notification channel tanımlandı
+  - Badge / unread counter bilinçli olarak devre dışı bırakıldı
+- Test:
+  - Android gerçek cihazda:
+    - foreground banner
+    - background notification
+    - killed state notification
+    - notification tap → doğru araç ekranı
+    manuel test edildi
+- Bilinçli UX / Teknik Borçlar:
+  - Foreground push banner uzun body durumlarında overflow riski taşır (prod polish’te ele alınacak)
+  - Push navigation dedup şu an sadece vehicle_uuid bazlıdır (type bazlı ayrım yok)
+  - flutter_local_notifications şu an yalnızca Android channel init için kullanılmaktadır
+  - Push UX senaryoları Android gerçek cihazda manuel test edilecek; otomatik test yok
+
+### CHECKPOINT #41 — Push Gönderim Optimizasyonu & Queue
+- Durum: DEVAM EDİYOR
+- Tamamlanan:
+  - Push gönderimi queue tabanlı hale getirildi.
+  - Retry & backoff mekanizması eklendi.
+  - Backend flood koruması uygulandı.
+  - PushService legacy FCM’den ayrıştırıldı.
 
 
 ## 🗂 ARŞİV – TARİHSEL TEKNİK NOTLAR
@@ -1223,7 +1270,7 @@ Teknik Not:
   - Push payload standardize edildi (vehicle_uuid)
 - Bilinçli teknik borçlar:
   - FCM legacy HTTP API kullanılıyor
-  - Push işlemleri sync çalışıyor (queue yok)
+  - Push işlemleri queue üzerinden async çalışıyor
   - Flutter push handling bu checkpoint’te yok
 - Test:
   - php artisan test → PASS

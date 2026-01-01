@@ -2,30 +2,30 @@
 
 namespace App\Services\Push;
 
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
-
 class PushNotificationService
 {
-    private const FCM_ENDPOINT = 'https://fcm.googleapis.com/fcm/send';
-
-    public function sendToToken(string $token, string $type, string $vehicleUuid, string $createdAt): void
+    public function __construct(private LegacyFcmTransport $legacyFcmTransport)
     {
-        $serverKey = config('services.fcm.server_key');
+    }
 
-        if (empty($serverKey)) {
-            Log::warning('FCM_SERVER_KEY is not set; skipping push notification.', [
-                'token' => $token,
-                'type' => $type,
-                'vehicle_uuid' => $vehicleUuid,
-            ]);
-            return;
+    public function sendToTokens(array $tokens, string $type, string $vehicleUuid, string $createdAt): void
+    {
+        $payload = $this->buildPayload($type, $vehicleUuid, $createdAt);
+
+        foreach ($tokens as $token) {
+            $this->legacyFcmTransport->send(
+                $token,
+                $payload['notification'],
+                $payload['data']
+            );
         }
+    }
 
-        $payload = [
-            'to' => $token,
+    public function buildPayload(string $type, string $vehicleUuid, string $createdAt): array
+    {
+        return [
             'notification' => [
-                'title' => $type === 'location' ? 'New location received' : 'New message received',
+                'title' => $this->buildTitle($type),
                 'body' => 'Tap to view details',
             ],
             'data' => [
@@ -34,28 +34,10 @@ class PushNotificationService
                 'created_at' => $createdAt,
             ],
         ];
+    }
 
-        $response = Http::withHeaders([
-            'Authorization' => 'key=' . $serverKey,
-            'Content-Type' => 'application/json',
-        ])->post(self::FCM_ENDPOINT, $payload);
-
-        if ($response->failed()) {
-            Log::error('FCM push send failed', [
-                'status' => $response->status(),
-                'body' => $response->body(),
-                'token' => $token,
-                'type' => $type,
-                'vehicle_uuid' => $vehicleUuid,
-            ]);
-            $response->throw();
-        }
-
-        Log::info('FCM push sent', [
-            'token' => $token,
-            'type' => $type,
-            'vehicle_uuid' => $vehicleUuid,
-            'note' => 'Using FCM legacy HTTP API (known technical debt)',
-        ]);
+    private function buildTitle(string $type): string
+    {
+        return $type === 'location' ? 'New location received' : 'New message received';
     }
 }

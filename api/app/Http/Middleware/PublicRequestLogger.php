@@ -36,9 +36,6 @@ class PublicRequestLogger
 
         $ok = (bool)($payload['ok'] ?? ($response->getStatusCode() < 400));
         $errorCode = $payload['error_code'] ?? null;
-        if (!$errorCode && $response->getStatusCode() === 429 && str_starts_with(ltrim($request->path(), '/'), 'api/public')) {
-            $errorCode = 'PUBLIC_RATE_LIMIT';
-        }
 
         try {
             PublicRequestLog::create([

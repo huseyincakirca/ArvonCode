@@ -5,14 +5,19 @@ import '../screens/vehicle_profile_screen.dart';
 
 class AppRouter {
   static final navigatorKey = GlobalKey<NavigatorState>();
+  static final RouteObserver<PageRoute<dynamic>> routeObserver =
+      RouteObserver<PageRoute<dynamic>>();
 
   static const String vehicleProfile = '/vehicle-profile';
   static const String home = '/home';
 
-  static Route<dynamic>? onGenerateRoute(RouteSettings settings) {
+  static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
       case home:
-        return MaterialPageRoute(builder: (_) => const HomeScreen());
+        return MaterialPageRoute(
+          builder: (_) => const HomeScreen(),
+          settings: settings,
+        );
       case vehicleProfile:
         final args = settings.arguments;
         String? vehicleUuid;
@@ -28,14 +33,19 @@ class AppRouter {
             builder: (_) => const Scaffold(
               body: Center(child: Text('Geçersiz push payload')),
             ),
+            settings: settings,
           );
         }
 
         return MaterialPageRoute(
           builder: (_) => VehicleProfileScreen(vehicleUuid: vehicleUuid!),
+          settings: settings,
         );
       default:
-        return null;
+        return MaterialPageRoute(
+          builder: (_) => const HomeScreen(),
+          settings: const RouteSettings(name: home),
+        );
     }
   }
 }
