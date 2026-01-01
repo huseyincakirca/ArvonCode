@@ -29,14 +29,21 @@ aktif referans DEĞİLDİR.
 
 ## 🔵 AKTİF CHECKPOINT DURUMU
 
- Aktif checkpoint: Checkpoint #48 — Parking Sözleşmesi + Flutter Owner Parking MVP — DEVAM EDİYOR
+ Aktif checkpoint: Checkpoint #48 — Parking Ürün Senaryosu + Owner Parking Akışı — DEVAM EDİYOR
 
-### CHECKPOINT #48 — Parking Sözleşmesi + Flutter Owner Parking MVP — DEVAM EDİYOR
+### CHECKPOINT #48 — Parking Ürün Senaryosu + Owner Parking Akışı — DEVAM EDİYOR
 - Hedefler:
   - docs/parking.md ile sözleşme kilitlendi
   - Flutter Parking service eklendi
   - Owner ParkingPage eklendi ve dashboard navigation bağlandı
   - Test komutları çalıştırıldı (route:list, php artisan test, flutter analyze)
+
+### Parking Feature — Ürün Senaryosu (Referans)
+- Owner, karttaki `vehicle_id` ile park konumunu kaydeder; kayıtlar yalnızca owner token ile okunur/silinir.
+- Giriş: QR/NFC → vehicle_uuid bilgisi; backend `vehicles.vehicle_id` eşleşmesi sonrası `parkings.vehicle_id` (numeric FK) yazılır.
+- Sahiplik kontrolü zorunlu; yetkisiz erişim 403.
+- Konum kaydetme onayı: lat/lng zorunlu validation; hatalarda 422/403/401.
+- “Parkta arabamı bul” akışı: son park kaydı alınır; yoksa `parking: null`; silme tüm ilgili park kayıtlarını temizler.
 
 ### CHECKPOINT #39 — Push Stabilizasyonu & UX İyileştirme
 - Durum: TAMAMLANDI

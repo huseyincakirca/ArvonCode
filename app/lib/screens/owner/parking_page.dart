@@ -275,6 +275,8 @@ class _ParkingPageState extends State<ParkingPage> {
     final lng = _latestParking?['lng']?.toString() ?? '-';
     final parkedAtRaw = _latestParking?['parked_at']?.toString() ?? '';
     final createdAtRaw = _latestParking?['created_at']?.toString() ?? '';
+    final latDouble = double.tryParse(lat);
+    final lngDouble = double.tryParse(lng);
 
     return Card(
       child: Padding(
@@ -287,8 +289,29 @@ class _ParkingPageState extends State<ParkingPage> {
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            Text('Lat: $lat'),
-            Text('Lng: $lng'),
+            if (latDouble != null && lngDouble != null)
+              Container(
+                height: 180,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Colors.blueGrey.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.blueGrey.withOpacity(0.3)),
+                ),
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.location_on, color: Colors.red, size: 32),
+                      Text('Lat: $latDouble, Lng: $lngDouble'),
+                    ],
+                  ),
+                ),
+              )
+            else ...[
+              Text('Lat: $lat'),
+              Text('Lng: $lng'),
+            ],
             Text('parked_at: ${DateFormatter.format(parkedAtRaw)}'),
             Text('created_at: ${DateFormatter.format(createdAtRaw)}'),
           ],

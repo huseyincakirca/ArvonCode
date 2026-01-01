@@ -1,4 +1,23 @@
-# Parking API Sözleşmesi (GERÇEK)
+# Parking — Ürün Senaryosu ve API Sözleşmesi (GERÇEK)
+
+## Parking Ürün Senaryosu (Owner-only)
+- Araç sahibi, park yerini uygulama üzerinden kaydeder ve sadece kendisi görüntüler/siler.
+- Kayıtlı park bilgisi **yalnızca araç sahibi token’ı** ile erişilebilir; ziyaretçi/public akışı yoktur.
+
+## Giriş Akışı (NFC / QR → vehicle_uuid)
+- Owner, karttaki `vehicle_id` (uuid/string) bilgisini bilir; park çağrıları bu değerle yapılır.
+- Backend bu değeri `vehicles.vehicle_id` ile eşleştirip ilgili `vehicles.id` üzerinde işlem yapar.
+
+## Sahiplik Kontrolü
+- Her endpoint, `vehicles.user_id == auth()->id()` kontrolü yapar; değilse 403 döner.
+
+## Konum Kaydetme Onayı
+- Park kaydı; lat/lng + vehicle_id ile **owner token** üzerinden kaydedilir.
+- Geçersiz/hatalı istekler 422 (validation) veya 403 (sahiplik) döner.
+
+## “Parkta Arabamı Bul” Akışı
+- Owner, “latest parking” sorgusuyla son park konumunu çeker; kayıt yoksa `parking: null`.
+- İsterse park kaydını silebilir; tüm park kayıtları ilgili araç için temizlenir.
 
 ## Kimlik Doğrulama
 - Tüm parking endpoint’leri `auth:sanctum` koruması altındadır.
