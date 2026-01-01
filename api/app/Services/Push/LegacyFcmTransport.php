@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use RuntimeException;
 
-class LegacyFcmTransport
+class LegacyFcmTransport implements PushTransportInterface
 {
     private const FCM_ENDPOINT = 'https://fcm.googleapis.com/fcm/send';
 

@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\Services\Push\FcmV1Transport;
+use App\Services\Push\LegacyFcmTransport;
+use App\Services\Push\PushTransportInterface;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -11,7 +14,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->bind(PushTransportInterface::class, function ($app) {
+            $transport = config('services.fcm.transport', 'legacy');
+
+            return match ($transport) {
+                'v1' => $app->make(FcmV1Transport::class),
+                default => $app->make(LegacyFcmTransport::class),
+            };
+        });
     }
 
     /**

@@ -77,6 +77,17 @@ aktif referans DEĞİLDİR.
   - Retry & backoff mekanizması eklendi.
   - Backend flood koruması uygulandı.
   - PushService legacy FCM’den ayrıştırıldı.
+### CHECKPOINT #42 — FCM HTTP v1 Geçiş Hazırlığı
+- Service Account tabanlı HTTP v1 transport eklendi.
+- Legacy ve HTTP v1 transport’lar paralel çalışabilir hale getirildi.
+- Transport seçimi config (.env) üzerinden yapılabilir hale getirildi.
+- JWT üretimi ve access token cache altyapısı eklendi.
+- Legacy fallback bilinçli olarak korundu.
+### Bilinçli Teknik Borçlar / Riskler
+- HTTP v1 geçişi tamamlandı ancak legacy henüz kaldırılmadı.
+- Service account IAM / quota hataları prod’da sessiz push kaybı riski taşır.
+- JWT token cache süresi yanlış yönetilirse push gecikmeleri yaşanabilir.
+- HTTP v1 multicast / batch gönderim bu checkpoint kapsamı dışındadır.
 ### Bilinçli Teknik Borçlar / Riskler (Checkpoint #41)
 - Push job constructor içinde `createdAt` gibi zaman verisi taşınmaktadır; job execution gecikmelerinde zaman semantiği sapabilir.
 - Flood koruması için kullanılan cache lock key, `vehicle_id` bulunamadığında `vehicle_uuid` fallback’i kullanmaktadır; tek tip anahtar semantiği yoktur.

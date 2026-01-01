@@ -4,7 +4,7 @@ namespace App\Services\Push;
 
 class PushNotificationService
 {
-    public function __construct(private LegacyFcmTransport $legacyFcmTransport)
+    public function __construct(private PushTransportInterface $transport)
     {
     }
 
@@ -13,7 +13,7 @@ class PushNotificationService
         $payload = $this->buildPayload($type, $vehicleUuid, $createdAt);
 
         foreach ($tokens as $token) {
-            $this->legacyFcmTransport->send(
+            $this->transport->send(
                 $token,
                 $payload['notification'],
                 $payload['data']
